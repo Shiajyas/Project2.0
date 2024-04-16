@@ -1,0 +1,124 @@
+
+<%- include("./partials/adminHeader.ejs") %>
+<section class="content-main">
+    <div class="row">
+        <div class="col-9">
+            <div class="content-header">
+                <h2 class="content-title">Add New Product</h2>
+                <% if (success && success.length > 0) { %>
+                    <!-- Display success messages -->
+                    <div class="alert alert-dismissible font-weight-bold font-weight-bold role=" alert">
+                        <p><%= success[0] %></p> <!-- Display only the first success message -->
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                 <form action="/admin/product/add" method="post" enctype="multipart/form-data" >
+                    <div class="mb-4">
+                        <label for="product_title" class="form-label">Product title</label>
+                        <input type="text" placeholder="Type here" name="name" class="form-control" id="product_title">
+                    </div>
+                    <div class="row gx-3">
+                        <div class="col-md-4 mb-3">
+                            <label for="product_color" class="form-label">Color</label>
+                            <input type="text" placeholder="Type here" name="color" class="form-control" id="product_color">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Size</label>
+                            <select class="form-select" name="size">
+                                <option>XXS</option>
+                                <option>XS</option>
+                                <option>S</option>
+                                <option>M</option>
+                                <option>L</option>
+                                <option>XL</option>
+                                <option>XXL</option>
+                              
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="product_sku" class="form-label">Rating <span>(Out of 5)</span></label>
+                            <input type="number" placeholder="Type here" name="rate" class="form-control" id="product_sku" max="5">
+                        </div>
+                        
+                    </div>
+                    <div class="mb-4">
+                        <label for="product_brand" class="form-label">Brand</label>
+                        <input type="text" placeholder="Type here" name="brand" class="form-control" id="product_brand">
+                    </div>
+                </div>
+            </div> <!-- card end// -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div>
+                        <label class="form-label">Description</label>
+                        <textarea placeholder="Type here" name="description" class="form-control" rows="4" name="description"></textarea>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <label class="form-label">Rich Description</label>
+                        <textarea placeholder="Type here" name="richdescription" class="form-control" rows="4" name="description"></textarea>
+                    </div>
+                </div>
+            </div> <!-- card end// -->
+         
+        </div>
+        <div class="col-lg-5">
+            <div class="card mb-9">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label">Price</label>
+                        <input type="number" placeholder="Type here" class="form-control" name="price">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">No Review</label>
+                        <input type="number" placeholder="Type here" class="form-control" name="status">
+                    
+                    </div>
+                    
+                <div class="mb-4">
+                    <label class="form-label">Category</label>
+                    <select name="CategoryId" id="category" class="form-select">
+                  
+                        <option value="">Select Category</option>
+                        <% for(let category of Categories) { %>
+                            <option value="<%= category._id %>"
+                                <%= category._id === Product.CategoryId ? "selected" : "" %>
+                            ><%= category.name %></option>
+                        <% } %>
+                    </select>
+                </div>
+               
+                  <hr>
+                </div>
+
+                
+            </div> <!-- card end// -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Media</h4>
+                </div>
+                <div class="card-body">
+                    <div class="input-upload">
+                        <img src="assets/imgs/theme/upload.svg" alt="">
+                        <input class="form-control" name="images" type="file" multiple>
+                    </div>
+                </div>
+            </div> 
+            <div>
+                <button class="btn btn-light rounded font-sm mr-5 text-body hover-up"><a href="/admin/product/draft">Save to draft</a></button>
+                <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</section>
+
+
+<%- include("./partials/adminFooter") %>

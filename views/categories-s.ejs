@@ -1,0 +1,126 @@
+
+<%- include("./partials/adminHeader.ejs") %>
+
+<section class="content-main" >
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Categories</h2>
+            <p>Add, edit or delete a category</p>
+        </div>
+        <div style="display: flex;">
+            <form action="/admin/categories/search" role="search" method="post" style="flex: 1;">
+                <input type="text" placeholder="Search Categories" name="searchTerm" class="form-control bg-white">
+            </form>
+            <button type="button" style="border: none; font-size: 25px; background: transparent;">
+                <a href="/admin/categories/view">
+                    <ion-icon name="refresh-circle-outline"></ion-icon>
+                </a>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <% if (success && success.length > 0) { %>
+        <!-- Display success messages -->
+        <div class="alert alert-dismissible font-weight-bold font-weight-bold role=" alert">
+            <p><%= success[0] %></p> <!-- Display only the first success message -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% } %>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <form method="post" action="/admin/categories/add">
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="name" id="product_name" />
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_slug" class="form-label">Slug</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="slug" id="product_slug" />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Parent</label>
+                            <select class="form-select" name="parent">
+                                <option>Shirts</option>
+                                <option>T-Shirts</option>
+                                <option>Pants</option>
+                                <option>Shoes</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea placeholder="Type here" class="form-control" name="description"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Create category</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-9">
+                    <div class="table-container" style="overflow-y: auto; height: auto;">
+                        <table class="table table-hover">
+                            <thead> 
+                                <tr>
+                                    <th class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" />
+                                        </div>
+                                    </th>
+                                    <th>No:</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Slug</th>
+                                    <th>Status</th>
+                                    <th>Parent</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% let counter = 1; %>
+                                <% cat.forEach(category => { %>
+                                    <% if (category) { %>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td><%= counter %></td> <!-- Common number -->
+                                            <td><b><%= category.name %></b></td>
+                                            <td><%= category.description %></td>
+                                            <td><%= category.slug %></td>
+                                            <td>
+                                                <% if (category.isListed) { %>
+                                                    <span style="color: green;">Active</span>
+                                                <% } else { %>
+                                                    <span style="color: red;">Inactive</span>
+                                                <% } %>
+                                            </td>
+                                            <td><%= category.parent %></td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                                        <i class="material-icons md-more_horiz"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <% if (category.isListed) { %>
+                                                            <a class="dropdown-item" href="/admin/categories/unlist?id=<%= category._id %>">Unlist</a>
+                                                        <% } else { %>
+                                                            <a class="dropdown-item" href="/admin/categories/list?id=<%= category._id %>">Add</a>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                                <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <% counter++; %>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                            
+                        </table>
+                        
+                        <%- include("./partials/adminFooter") %>

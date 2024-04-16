@@ -1,0 +1,41 @@
+<%- include("./partials/adminHeader") %>
+
+        <section class="content-main mt-80 mb-80">
+            <div class="card mx-auto card-login">
+                <div class="card-body">
+                    <p>ID: <%= category.id %></p>
+                   
+                    <h4 class="card-title mb-4">Edit category : <span><%= category.name %></span></h4>
+                    <form method="post" action="/admin/categories/edit?id = <%= category.id %>" >
+                        <div class="mb-3">
+                            <label class="form-label">Category Name:</label>
+                            <input class="form-control" placeholder ="<%= category.name %>" name="name" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Slug:</label>
+                            <input class="form-control" placeholder ="<%= category.slug %>" name="slug" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Parent:</label>
+                            <select class="form-select" name="parent">
+                                <option <% if (category.parent === 'Shirt') { %> selected <% } %>>Shirt</option>
+                                <option <% if (category.parent === 'T-Shirt') { %> selected <% } %>>T-Shirt</option>
+                                <option <% if (category.parent === 'Pants') { %> selected <% } %>>Pants</option>
+                                <option <% if (category.parent === 'Shoes') { %> selected <% } %>>Shoes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description:</label>
+                            <textarea class="form-control" placeholder="<%= category.description %>" name="description"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+                </div>
+            </div>
+            
+        </section>
+       
+
+           
+        <%- include("./partials/adminFooter.ejs") %>

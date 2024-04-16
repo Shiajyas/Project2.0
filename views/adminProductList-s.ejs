@@ -1,0 +1,116 @@
+<%- include("./partials/adminHeader.ejs") %>
+
+<section class="content-main" >
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Product List</h2>
+           
+        </div>
+        <div style="display: flex;">
+            <form action="/admin/product/search" role="search" method="post" style="flex: 1;">
+                <input type="text" placeholder="SearchProduct" name="searchTerm" class="form-control bg-white">
+            </form>
+            <button type="button" style="border: none; font-size: 25px; background: transparent;">
+                <a href="/admin/product/list">
+                    <ion-icon name="refresh-circle-outline"></ion-icon>
+                </a>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <% if (success && success.length > 0) { %>
+        <!-- Display success messages -->
+        <div class="alert alert-dismissible font-weight-bold font-weight-bold role=" alert">
+            <p><%= success[0] %></p> <!-- Display only the first success message -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% } %>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-container" style="overflow-y: auto; height: auto;">
+                        <table class="table table-hover">
+                            <thead> 
+                                <tr>
+                                    <th class="text-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" />
+                                        </div>
+                                    </th>
+                                    <th>No</th>
+                                    <th>Product Name</th>
+                                    <th>Brand</th>
+                                    <th>Price</th>
+                                    <th>Category</th>
+                                   
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% let counter = 1; %>
+                                <% cat.forEach(product=> { %>
+                                    <% if (product) { %>
+                                        <tr>
+                                            <td class="text-center">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" />
+                                                </div>
+                                            </td>
+                                            <td><%= counter %></td> <!-- Common number -->
+                                            <td><b><%= product.name %></b></td>
+                                            <td><%= product.brand %></td>
+                                            <td><%= product.price %></td>
+                                           
+                                            <td>
+                                                <% if (product.images && product.images.length > 0) { %>
+                                                    <img src="<%= product.images[0] %>" alt="Product Image" style="width: 35px; height: 35px;">
+                                                <% } else { %>
+                                                    <span>No Image</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (product.isListed) { %>
+                                                    <span style="color: green;">Active</span>
+                                                <% } else { %>
+                                                    <span style="color: red;">Inactive</span>
+                                                <% } %>
+                                            </td>
+                                          
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                                        <i class="material-icons md-more_horiz"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <% if (product.isListed) { %>
+                                                            <a class="dropdown-item" href="/admin/product/block?id=<%= product._id %>">Unlist</a>
+                                                        <% } else { %>
+                                                            <a class="dropdown-item" href="/admin/product/unblock?id=<%= product._id %>">Add</a>
+                                                        <% } %>
+                                                        <a href="/admin/product/edit?id=<%= product._id %>" class="dropdown-item">Edit</a>
+                                                        <a href="/admin/product/delete?id=<%= product._id %>" class="dropdown-item">Delete</a>
+                                                    </div>
+                                                   
+                                                </div>
+                                                <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                        <% counter++; %>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                            
+                        </table>
+                       
+                    </div>
+                </div> <!-- .col-md-12 -->
+            </div> <!-- .row // -->
+        </div> <!-- card body .// -->
+    </div> <!-- card .// -->
+</section> <!-- content-main end// -->
+
+<%- include("./partials/adminFooter") %>

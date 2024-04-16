@@ -1,0 +1,17 @@
+
+
+<figure class="border-radius-10">
+    <img src="<%= products.images[0] %>" class="main-image img-fluid " id="img-container" alt="Product Image" onclick="toggleZoom(event)">
+</figure>
+
+<img src="assets/imgs/shop/thumbnail-3.jpg" alt="product image">
+
+<div class="slider-nav-thumbnails pl-15 pr-15"></div>
+<% for (let index = 0; index < products.images.length; index++) { %>
+    <div>
+        <img src="<%= products.images[index] %>" class="additional-image" alt="Additional Image <%= index + 1 %>">
+    </div>
+
+    <% } %>
+
+ <div class="slider-nav-thumbnails pl-15 pr-15"></div>
