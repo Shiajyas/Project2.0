@@ -7,7 +7,7 @@ const connectDB = async () => {
    
       useNewUrlParser: false, 
       useUnifiedTopology: true,
-      bufferCommands: false, 
+      bufferCommands: true, 
       serverSelectionTimeoutMS: 10000,
     });
 

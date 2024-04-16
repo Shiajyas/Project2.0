@@ -24,16 +24,6 @@ const categorySchema = new mongoose.Schema({
         },
         set: (value) => value.charAt(0).toUpperCase() + value.slice(1)
     },
-    slug:{
-        type: String,
-        required: true
-    },
-    parent:{
-        type: String,
-        toLowerCase: true,       
-         required: true,
-        
-    },
     description:{
         type: String,
         required: true

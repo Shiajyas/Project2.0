@@ -6,7 +6,6 @@ const asyncHandler = require('express-async-handler');
 const {  validationResult } = require('express-validator');
 const jwt = require("jsonwebtoken")
 const util = require("util");
-const { use } = require('../routes/authUserRoutes');
 const { error, log } = require('console'); 
 const sendEmail = require("../Utils/email")
 const bcrypt = require("bcryptjs");
@@ -17,7 +16,7 @@ const bcrypt = require("bcryptjs");
 const userSignup = (req,res)=>{
    try {
   
-    return res.status(200).render("login", {successMsg: "", error: [] });
+    return res.status(200).render("signup", {successMsg: "", error: [] });
    } catch (error) {
     console.log(error.message);
    }
@@ -32,7 +31,7 @@ const userSignupPost = [
       if (!errors.isEmpty()) {
         const errorArray = errors.array().map((err) => err.msg);
       
-        return res.status(401).render('login', { error: errorArray, successMsg: '' });
+        return res.status(401).render('signup', { error: errorArray, successMsg: '' });
       } else {
         const { username, email,contact, password, cpassword } = req.body;
         
@@ -45,14 +44,14 @@ const userSignupPost = [
   
           console.log(newUser); 
           console.log(token);
-          return res.status(200).render('login', { successMsg: 'Signup successful', error: [] });
+          return res.status(200).render('signup', { successMsg: 'Signup successful', error: [] });
         } catch (error) {
           console.error(error);
   
           if (error.name === 'ValidationError' && error.errors.email.kind === 'unique') {
-            return res.status(500).render('login', { error: ['Oops! Something went wrong.'], successMsg: '' });
+            return res.status(500).render('signup', { error: ['Oops! Something went wrong.'], successMsg: '' });
           } else {
-            return res.status(401).render('login', { error: ['Email already registered'], successMsg: '' });
+            return res.status(401).render('signup', { error: ['Email already registered'], successMsg: '' });
           }
         }
       }
@@ -60,48 +59,46 @@ const userSignupPost = [
   ];
   
   
-const userLoginPost = asyncHandler(async (req, res, next) => {
+  const userLoginPost = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
    
     if (!email || !password) {
-     
-      return res.status(400).render("login", {error: ['Please provide email and password'], successMsg: '' });
+        return res.status(400).render("login", { error: ['Please provide email and password'], successMsg: '' });
     }
   
     try {
-      const newUser = await User.findOne({ email }).select("+password");
+        const newUser = await User.findOne({ email }).select("+password");
   
-      if (!newUser) {
-        return res.status(401).render("login", {error: ['Invalid email or password..    '], successMsg: '' });
-      }
-      const isPasswordMatch = await newUser.comparePassword(password);
+        if (!newUser) {
+            return res.status(401).render("login", { error: ['Invalid email or password..'], successMsg: '' });
+        }
+        
+        if(newUser.blocked) {
+            return res.status(401).render("login", { error: ['Your account is blocked. Please contact support.'], successMsg: '' });
+        }
+
+        const isPasswordMatch = await newUser.comparePassword(password);
   
-      if (isPasswordMatch) {
-       
-        const token = signToken(newUser._id);
-      
-        // Set token as a cookie with options (e.g., secure, httpOnly, sameSite)
-        res.cookie('token', token, {
-          httpOnly: true, // Cookie accessible only by the web server
-          secure: true, // Enable only in HTTPS mode
-          sameSite: 'strict', // Restrict cookie sending to same-site requests
-          // Add other necessary cookie options
-        });
-      
-        return res.status(200).redirect("/user/home"); // Redirect to dashboard after setting the cookie
-      } else {
-        console.log("fail");
-        return res.status(401).render("login", { error: ['Invalid email or password'], successMsg: '' });
-      }
+        if (isPasswordMatch) {
+            const token = signToken(newUser._id);
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+            });
+            return res.status(200).redirect("/"); // Redirect to dashboard after setting the cookie
+        } else {
+            return res.status(401).render("login", { error: ['Invalid email or password'], successMsg: '' });
+        }
     } catch (err) {
-      console.error(err.message);
-      if (err.name === "ServerError") {
-        return res.status(500).render("login", { error: ['Server error. Please try again later.'], successMsg: '' });
-      } else {
-        return res.status(500).render("login", { error: [], successMsg: '' });
-      }
+        console.error(err.message);
+        if (err.name === "ServerError") {
+            return res.status(500).render("login", { error: ['Server error. Please try again later.'], successMsg: '' });
+        } else {
+            return res.status(500).render("login", { error: [], successMsg: '' });
+        }
     }
-  });
+});
 
   const userLogin = (req, res) => {
   
@@ -181,7 +178,7 @@ const protectRules = asyncHandler(async (req, res, next) => {
 
   const userLogout = (req,res)=>{
     res.cookie("token","", {maxAge:1})
-    return res.status(200).render("login",{ error: ['LogOut successfull!!'], successMsg: '' })
+    return res.status(200).redirect("/")
   }
   
   const forgetPassword = (req, res) => {
@@ -267,32 +264,32 @@ const resetPasswordPost = asyncHandler(async (req, res) => {
     return res.status(200).redirect("/admin/login")
   }
 
-  const getUserHome = asyncHandler(async (req, res) => {
-    try {
+//   const getUserHome = asyncHandler(async (req, res) => {
+//     try {
      
-        const userId = req.user._id; // Retrieve the user ID
-        const products = await Product.find({ isListed: true }).limit(9);
-        const user = await User.findById(userId);
+//         const userId = req.user._id; // Retrieve the user ID
+//         const products = await Product.find({ isListed: true }).limit(9);
+//         const user = await User.findById(userId);
         
 
-        for (const product of products) {
-          const categoryId = product.category;
-          const category = await Category.findById(categoryId);
-          product.categoryD = category.isListed; // Add category details to each product
-      }
+//         for (const product of products) {
+//           const categoryId = product.category;
+//           const category = await Category.findById(categoryId);
+//           product.categoryD = category.isListed; // Add category details to each product
+//       }
  
        
-        if (user) {
-            res.render("home2", { user: user, products: products });
-        } else {
-            res.render("home2", { products: products });
-        }
-    } catch (err) {
-        // Handle errors appropriately
-        console.error(err);
-        return res.status(500).render('404');
-    }
-}); 
+//         if (user) {
+//             res.render("home2", { user: user, products: products });
+//         } else {
+//             res.render("home2", { products: products });
+//         }
+//     } catch (err) {
+//         // Handle errors appropriately
+//         console.error(err);
+//         return res.status(500).render('404');
+//     }
+// }); 
 
 const getUserProductDetails = asyncHandler(async (req, res) => {
   try {
@@ -409,7 +406,7 @@ module.exports = {
     userSignupPost,
     userLoginPost,
     userLogin,
-    getUserHome,
+    // getUserHome,
     protectRules,
     restrict,
     userLogout,

@@ -25,6 +25,7 @@ const  {
       adminCategoryRoutes.get("/edit",adminProtectRules,adminRestrict("admin"),getEditCategory)
       adminCategoryRoutes.post("/edit",adminProtectRules,adminRestrict("admin"),editCategory) 
       adminCategoryRoutes.get("/remove",adminProtectRules,adminRestrict("admin"),deleteCategory) 
-      adminCategoryRoutes.post("/search",adminProtectRules,adminRestrict("admin"),searchCategory)
+      adminCategoryRoutes.post("/search",adminProtectRules,adminRestrict("admin"),searchCategory) 
+    
       
 module.exports = adminCategoryRoutes;

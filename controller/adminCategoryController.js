@@ -173,14 +173,16 @@ const searchCategory = async (req, res) => {
       const category = await Category.find({
         $or: [{ name: { $regex: new RegExp(searchNoSpecialChar, "i") } }],
       });
+      console.log(category);
      if(category){
-        const success = req.flash('edit')
-        return res.status(200).render("categories-s",{success:success,cat: category})
+        return res.status(200).render("categorey-s",{success:[],cat: category})
      }else{
-        
         console.log("Category not found");
+       
         req.flash("edit","No Matched categories")
-        res.status(200).redirect("/admin/categories/view");
+        return  res.status(200).redirect("/admin/categories/view");
+      
+      
      }
     } catch (error) {
    

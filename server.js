@@ -9,6 +9,9 @@ const flash = require("connect-flash")
 const path = require("path")
 const nocache = require("nocache")
 const User = require("./models/UserDb")
+const Product = require("./models/productData")
+const Category = require("./models/categoryData")
+const {protectRules,restrict}  = require("./controller/userAuthController")
 
 
 connectDB()
@@ -70,22 +73,50 @@ app.use("/user/public",express.static(path.join(__dirname,"public")))
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
  
+
  
-app.get("/",async(req,res)=>{
+app.get("/", protectRules, restrict("user", "admin"), async (req, res) => {
     try {
-        let token = req.query.token || req.cookies.token || req.headers.authorization;
-        if(token){
-          let user = {username: "Test"}
-            return res.status(200).render("home1",{user: user});
-        }else{
-            return res.status(200).render("home1",{user: null});
+        const products = await Product.find({ isListed: true }).limit(9);
+
+        for (const product of products) {
+            const categoryId = product.category;
+            const category = await Category.findById(categoryId);
+            if (category) {
+                product.categoryD = category.isListed; // Add category details to each product
+            } else {
+                // Handle the case where category is undefined
+                console.error(`Category not found for product ${product._id}`);
+            }
         }
-    } catch (error) {
-        // Handle errors such as database query errors
-        console.error(error);
+
+        if (!req.user || !req.user._id) {
+            // If user is not logged in or user ID is not provided
+            console.log("User not logged in or user ID not provided");
+            res.render("home2", { products: products, user: null });
+        } else {
+            // If user is logged in
+            const userId = req.user._id;
+            const user = await User.findById(userId);
+
+            if (!user || user.blocked) {
+                // If user doesn't exist or is blocked
+                console.log("User does not exist or is blocked");
+                res.render("home2", { products: products, user: null });
+            } else {
+                // If user is not blocked, render with user data
+                console.log("User exists and is not blocked");
+                res.render("home2", { user: user, products: products });
+            }
+        }
+    } catch (err) {
+        // Handle errors appropriately
+        console.error(err);
         return res.status(500).render('404');
     }
-})
+});
+
+
  
 app.use("/user", require("./routes/authUserRoutes"))    
 app.use("/admin",require("./routes/authRouterAdmin"))

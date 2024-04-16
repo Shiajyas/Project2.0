@@ -98,20 +98,25 @@
                   <hr>
                 </div>
 
-                
-            </div> <!-- card end// -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>Media</h4>
-                </div>
-                <div class="card-body">
-                    <div class="input-upload">
-                        <img src="assets/imgs/theme/upload.svg" alt="">
-                        <input class="form-control" name="images" type="file" multiple>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Media</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-upload">
+                            <!-- Image preview will be displayed here -->
+                            <img id="imagePreview" src="assets/imgs/theme/upload.svg" alt="Selected Image">
+                         
+                            <input class="form-control" id="imageInput" name="images" type="file" multiple onchange="previewImages(event)">
+                          <br>  <select id="imageSelector" class="form-select" onchange="showSelectedImage()">
+                                <option value="-1">Not Selected    </option>
+                            </select>
+                            <label id="imageSelectorLabel" for="imageInput"></label>
+                        </div>
                     </div>
                 </div>
-            </div> 
-            <div>
+            
+                    <div>
                 <button class="btn btn-light rounded font-sm mr-5 text-body hover-up"><a href="/admin/product/draft">Save to draft</a></button>
                 <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
             </div>
@@ -120,5 +125,54 @@
     </div>
 </section>
 
+<script>
+    function previewImages(event) {
+        var selector = document.getElementById("imageSelector");
+        var preview = document.getElementById("imagePreview");
+        var files = event.target.files;
+
+        selector.innerHTML = "<option value='-1'>Select Image</option>";
+
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var option = document.createElement("option");
+                option.text = files[i].name;
+                option.value = i;
+                selector.add(option);
+            }
+
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                preview.src = event.target.result;
+            }
+
+            reader.readAsDataURL(files[0]); // Preview the first selected image
+        } else {
+            // If no image is selected, clear the preview
+            preview.src = "assets/imgs/theme/upload.svg";
+        }
+    }
+
+    function showSelectedImage() {
+        var selector = document.getElementById("imageSelector");
+        var preview = document.getElementById("imagePreview");
+        var files = document.getElementById("imageInput").files;
+
+        var selectedIndex = parseInt(selector.value);
+
+        if (selectedIndex >= 0 && selectedIndex < files.length) {
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                preview.src = event.target.result;
+            }
+
+            reader.readAsDataURL(files[selectedIndex]);
+        } else {
+            preview.src = "assets/imgs/theme/upload.svg";
+        }
+    }
+</script>
 
 <%- include("./partials/adminFooter") %>

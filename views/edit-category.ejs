@@ -11,19 +11,7 @@
                             <label class="form-label">Category Name:</label>
                             <input class="form-control" placeholder ="<%= category.name %>" name="name" type="text">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Slug:</label>
-                            <input class="form-control" placeholder ="<%= category.slug %>" name="slug" type="text">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Parent:</label>
-                            <select class="form-select" name="parent">
-                                <option <% if (category.parent === 'Shirt') { %> selected <% } %>>Shirt</option>
-                                <option <% if (category.parent === 'T-Shirt') { %> selected <% } %>>T-Shirt</option>
-                                <option <% if (category.parent === 'Pants') { %> selected <% } %>>Pants</option>
-                                <option <% if (category.parent === 'Shoes') { %> selected <% } %>>Shoes</option>
-                            </select>
-                        </div>
+                      
                         
                         <div class="mb-3">
                             <label class="form-label">Description:</label>

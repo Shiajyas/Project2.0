@@ -38,19 +38,6 @@
                             <input type="text" placeholder="Type here" class="form-control" name="name" id="product_name" />
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">Slug</label>
-                            <input type="text" placeholder="Type here" class="form-control" name="slug" id="product_slug" />
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Parent</label>
-                            <select class="form-select" name="parent">
-                                <option>Shirts</option>
-                                <option>T-Shirts</option>
-                                <option>Pants</option>
-                                <option>Shoes</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
                             <label class="form-label">Description</label>
                             <textarea placeholder="Type here" class="form-control" name="description"></textarea>
                         </div>
@@ -69,17 +56,16 @@
                                             <input class="form-check-input" type="checkbox" value="" />
                                         </div>
                                     </th>
-                                    <th>No:</th>
+                                    <th>No</th>
                                     <th>Name</th>
                                     <th>Description</th>
-                                    <th>Slug</th>
                                     <th>Status</th>
-                                    <th>Parent</th>
                                     <th class="text-end">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% let counter = 1; %>
+                                <% let hasMatchedCategories = false; %>
                                 <% cat.forEach(category => { %>
                                     <% if (category) { %>
                                         <tr>
@@ -91,7 +77,7 @@
                                             <td><%= counter %></td> <!-- Common number -->
                                             <td><b><%= category.name %></b></td>
                                             <td><%= category.description %></td>
-                                            <td><%= category.slug %></td>
+                                          
                                             <td>
                                                 <% if (category.isListed) { %>
                                                     <span style="color: green;">Active</span>
@@ -99,7 +85,7 @@
                                                     <span style="color: red;">Inactive</span>
                                                 <% } %>
                                             </td>
-                                            <td><%= category.parent %></td>
+                                          
                                             <td class="text-end">
                                                 <div class="dropdown">
                                                     <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -111,16 +97,35 @@
                                                         <% } else { %>
                                                             <a class="dropdown-item" href="/admin/categories/list?id=<%= category._id %>">Add</a>
                                                         <% } %>
+                                                        <a class="dropdown-item edit-link" href="/admin/categories/edit?id=<%= category._id %>">Edit</a>
+                                                        <a class="dropdown-item delete-link" href="/admin/categories/remove?id=<%= category._id %>">Delete</a>                                                            
                                                     </div>
                                                 </div>
                                                 <!-- dropdown //end -->
                                             </td>
                                         </tr>
                                         <% counter++; %>
+                                        <% hasMatchedCategories = true; %> <!-- Set to true if at least one category is rendered -->
                                     <% } %>
                                 <% }); %>
+                    
+                                <% if (!hasMatchedCategories) { %> <!-- Check if no categories were rendered -->
+                                    <tr>
+                                        <td colspan="6" class="text-center">No matched results found</td>
+                                    </tr>
+                                <% } %>
                             </tbody>
-                            
                         </table>
-                        
-                        <%- include("./partials/adminFooter") %>
+                    </div>
+                    
+                </div> <!-- .col// -->
+
+            </div> <!-- .row // -->
+        </div> <!-- card body .// -->
+
+    </div> <!-- card .// -->
+
+</section> <!-- content-main end// -->
+
+       
+        <%- include("./partials/adminFooter") %>

@@ -91,8 +91,9 @@
                                                         <% } else { %>
                                                             <a class="dropdown-item" href="/admin/product/unblock?id=<%= product._id %>">Add</a>
                                                         <% } %>
-                                                        <a href="/admin/product/edit?id=<%= product._id %>" class="dropdown-item">Edit</a>
-                                                        <a href="/admin/product/delete?id=<%= product._id %>" class="dropdown-item">Delete</a>
+                                                        <a class="dropdown-item edit-link" href="/admin/categories/edit?id=<%= c._id %>">Edit</a>
+                                                        <a class="dropdown-item delete-link" href="/admin/categories/delete<%= y._id %>">Delete</a>
+                                                            
                                                     </div>
                                                    
                                                 </div>
