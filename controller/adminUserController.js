@@ -50,7 +50,7 @@ const getUnlistUser = async (req, res) => {
      console.log(2);
         let cat = await User.findById({_id: id})
         await User.findByIdAndUpdate({ _id: id }, { $set: { isBlocked: true } })
-        req.flash("edit",`Listed Customer : ${cat.username} `)
+        req.flash("edit",`listed Customer : ${cat.username} `)
         res.status(200).redirect('/admin/customer/view');
     } catch (error) {
         console.log(error.message);

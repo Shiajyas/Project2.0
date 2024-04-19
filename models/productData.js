@@ -40,15 +40,16 @@ const productSchema = mongoose.Schema({
      richdescription: { 
         type: String 
     },
-    price: { type: Number,
+    price: {
+         type: Number,
          required: true
          },
     status: {
          type: String, 
           required: true 
         },
-    tags: { 
-        type: [String]
+    stock: { 
+        type: String,
      },
     category: {
         type: mongoose.Schema.Types.ObjectId,

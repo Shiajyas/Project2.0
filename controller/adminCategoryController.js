@@ -6,7 +6,7 @@ const {filedCheker} = require("../utils/authHandler")
 const fs = require("fs")
 const path = require("path")
 const imageProcessing = require("../utils/cropedImage")
-
+ 
 const getCategory = async (req, res) => { 
       let perpage = 10;
     let page = req.query.page || 1;
@@ -39,19 +39,19 @@ const getCategory = async (req, res) => {
 
 const addCategorie =  async (req, res) => {
     console.log("helo");
-    const {name,slug,parent,description} = req.body
+    const {name,description} = req.body
  if(!req.body){
     console.log("no");
  }
  console.log(req.body);
     // Check for a valid category name
-    if (!filedCheker({name,slug,parent,description})) {
+    if (!filedCheker({name,description})) {
       req.flash("edit", `Unsuccessful Add category. Please provide a valid category name.`);
       return res.status(400).redirect("/admin/categories/view");
     }
   
     try {  
-      const newCategory = new Category({name,slug,parent,description});
+      const newCategory = new Category({name,description});
       const savedCategory = await newCategory.save();
   console.log(savedCategory);
 
@@ -64,6 +64,7 @@ const addCategorie =  async (req, res) => {
             const validationErrorMessage = error.message.split(': ')[2];
             req.flash('edit', `Not Added!! Name ${validationErrorMessage}`);
         } else {
+            console.error(error);
             req.flash('edit', 'An error occurred while adding the category.');
         }
         res.redirect('/admin/categories/view');

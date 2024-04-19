@@ -16,7 +16,8 @@ const {
     unBlockCProduct,
     deleteProduct,
     searchProduct,
-    getEditProduct
+    getEditProduct,
+    editProduct
 } = require("../controller/adminProductController")
 
 
@@ -28,5 +29,6 @@ adminProductRoutes.get("/unblock",adminProtectRules,adminRestrict("admin"),unBlo
 adminProductRoutes.get("/delete",adminProtectRules,adminRestrict("admin"),deleteProduct)
 adminProductRoutes.post("/search",adminProtectRules,adminRestrict("admin"),searchProduct)
 adminProductRoutes.get("/edit",adminProtectRules,adminRestrict("admin"),getEditProduct)
+adminProductRoutes.post("/edit",adminProtectRules,adminRestrict("admin"), upload.array("images", 4),editProduct) 
 
 module.exports = adminProductRoutes

@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 
 const categorySchema = new mongoose.Schema({
-    id: {
-        type: String,
-        unique: true,
-        required: false
-    },
+  
     isListed:{
     type: Boolean,
        default: true

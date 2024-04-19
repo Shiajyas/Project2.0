@@ -6,11 +6,9 @@ const asyncHandler = require('express-async-handler');
 const {  validationResult } = require('express-validator');
 const jwt = require("jsonwebtoken")
 const util = require("util");
-const { error, log } = require('console'); 
 const sendEmail = require("../Utils/email")
 const bcrypt = require("bcryptjs");
 // Handle user signup POST request
-
 
 
 const userSignup = (req,res)=>{
@@ -164,17 +162,22 @@ const protectRules = asyncHandler(async (req, res, next) => {
   
   // add seprate permission to access admin and user
   
-  const restrict = (...role)=>{
-    return (req,res,next)=>{
-  
-      if(!role.includes(req.user.role)){
-        
-        req.flash("error","your profile not valid, create new one")
-        return res.status(500).render("login",{ error: ['LogOut successfull!!'], successMsg: '' })
-      }
-      next ()
-    }
-  }
+  const restrict = (...roles) => {
+    return (req, res, next) => {
+        try {
+            // Check if the user's role is included in the specified roles
+            const userRole = req.user ? req.user.role : null;
+            if (!roles.includes(userRole)) {
+                req.flash("error", "Your profile is not valid, create a new one");
+                return res.status(403).render("login", { error: ['Unauthorized access'], successMsg: '' });
+            }
+            next();
+        } catch (error) {
+            console.error("Error in restrict middleware:", error);
+            return res.status(500).render("login", { error: ['Error occurred'], successMsg: '' });
+        }
+    };
+};
 
   const userLogout = (req,res)=>{
     res.cookie("token","", {maxAge:1})
@@ -398,6 +401,8 @@ const productSortAVG = async (req, res) => {
     res.status(500).render("404");
   }
 };
+
+
 
 
 

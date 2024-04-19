@@ -6,7 +6,7 @@
                     <p>ID: <%= category.id %></p>
                    
                     <h4 class="card-title mb-4">Edit category : <span><%= category.name %></span></h4>
-                    <form method="post" action="/admin/categories/edit?id = <%= category.id %>" >
+                    <form method="post" action="/admin/categories/edit?id=<%= category._id %>" >
                         <div class="mb-3">
                             <label class="form-label">Category Name:</label>
                             <input class="form-control" placeholder ="<%= category.name %>" name="name" type="text">

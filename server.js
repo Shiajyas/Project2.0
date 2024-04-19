@@ -16,7 +16,7 @@ const {protectRules,restrict}  = require("./controller/userAuthController")
 
 connectDB()
 const app = express()
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 3000
 
 app.use(cookie()) 
 app.use(bodyParser.urlencoded({extended: true}))
@@ -24,10 +24,11 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(nocache())
 
 app.use(session({
-    secret: "secret", 
+    secret: process.env.SESSION_SECRET, 
     resave: false, 
     saveUninitialized: true,
     cookie:{  
+
         maxAge: 1000*60*60*24*7 // 1 week
     }
 }))
@@ -87,6 +88,7 @@ app.get("/", protectRules, restrict("user", "admin"), async (req, res) => {
             } else {
                 // Handle the case where category is undefined
                 console.error(`Category not found for product ${product._id}`);
+                
             }
         }
 

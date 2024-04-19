@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-9">
             <div class="content-header">
-                <h2 class="content-title">Add New Product</h2>
+                <h2 class="content-title">Edit product: <%= product.name %></h2>
                 <% if (success && success.length > 0) { %>
                     <!-- Display success messages -->
                     <div class="alert alert-dismissible font-weight-bold font-weight-bold role=" alert">
@@ -15,10 +15,11 @@
             </div>
         </div>
         
-        <div class="col-lg-6">
-            <div class="card mb-4">
+               <div class="col-lg-6">
+                    <div class="card mb-4">
                 <div class="card-body">
-                 <form action="/admin/product/add" method="post" enctype="multipart/form-data" >
+                    <form action="/admin/product/edit?id=<%= product._id %>" method="post" enctype="multipart/form-data" >
+
                     <div class="mb-4">
                         <label for="product_title" class="form-label">Product title</label>
                         <input type="text" placeholder="<%= product.name %>" name="name" class="form-control" id="product_title">
@@ -26,29 +27,30 @@
                     <div class="row gx-3">
                         <div class="col-md-4 mb-3">
                             <label for="product_color" class="form-label">Color</label>
-                            <input type="text" placeholder="<%= product.color %>" name="color" class="form-control" id="product_color">
+                            <input type="text" placeholder= "<%= product.color %>" name="color" class="form-control" id="product_color">
                         </div>
                         <div class="mb-4">
                             <label class="form-label">Size</label>
                             <select class="form-select" name="size">
-                                <option <%= product.size === 'XXS' ? 'selected' : '' %> >XXS</option>
-                                <option <%= product.size === 'XS' ? 'selected' : '' %> >XS</option>
-                                <option <%= product.size === 'S' ? 'selected' : '' %> >S</option>
-                                <option <%= product.size === 'M' ? 'selected' : '' %> >M</option>
-                                <option <%= product.size === 'L' ? 'selected' : '' %> >L</option>
-                                <option <%= product.size === 'XL' ? 'selected' : '' %> >XL</option>
-                                <option <%= product.size === 'XXL' ? 'selected' : '' %> >XXL</option>
+                                <option>XXS</option>
+                                <option>XS</option>
+                                <option>S</option>
+                                <option>M</option>
+                                <option>L</option>
+                                <option>XL</option>
+                                <option>XXL</option>
+                              
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="product_sku" class="form-label">Rating <span>(Out of 5)</span></label>
-                            <input type="number" placeholder="<%= product.rate %>" name="rate" class="form-control" id="product_sku" max="5">
+                            <input type="number" placeholder= "<%= product.rate %>" name="rate" class="form-control" id="product_sku" max="5">
                         </div>
                         
                     </div>
                     <div class="mb-4">
                         <label for="product_brand" class="form-label">Brand</label>
-                        <input type="text" placeholder="<%= product.rate %>" name="brand" class="form-control" id="product_brand">
+                        <input type="text" placeholder= "<%= product.brand %>" name="brand" class="form-control" id="product_brand">
                     </div>
                 </div>
             </div> <!-- card end// -->
@@ -56,19 +58,19 @@
                 <div class="card-body">
                     <div>
                         <label class="form-label">Description</label>
-                        <textarea placeholder="<%= product.description %>" name="description" class="form-control" rows="4" name="description"></textarea>
+                        <textarea placeholder= "<%= product.description %>" name="description" class="form-control" rows="4" name="description"></textarea>
                     </div>
                 </div>
                 <div class="card-body">
                     <div>
                         <label class="form-label">Rich Description</label>
-                        <textarea placeholder="<%= product.description %>" name="richdescription" class="form-control" rows="4" name="description"></textarea>
+                        <textarea placeholder="<%= product.richdescription %>" name="richdescription" class="form-control" rows="4" name="description"></textarea>
                     </div>
                 </div>
             </div> <!-- card end// -->
          
-        </div>
-        <div class="col-lg-5">
+          </div>
+           <div class="col-lg-5">
             <div class="card mb-9">
                 <div class="card-body">
                     <div class="mb-4">
@@ -76,14 +78,18 @@
                         <input type="number" placeholder="<%= product.price %>" class="form-control" name="price">
                     </div>
                     <div class="mb-4">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" name="status">
-                            <option>Published</option>
-                            <option>Draft</option>
-                        </select>
+                        <label class="form-label">No Review</label>
+                        <input type="number" placeholder="<%= product.status %>" class="form-control" name="status">
+                    
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Stock</label>
+                        <input type="number" placeholder="<%= product.stock %>" class="form-control" name="stock">
+                    
                     </div>
                     
-                    <div class="mb-4">
+                   <div class="mb-4">
                         <label class="form-label">Category</label>
                         <select name="CategoryId" id="category" class="form-select">
                             <option value="">Select Category</option>
@@ -91,32 +97,86 @@
                                 <option value="<%= category._id %>" <%= category._id.toString() === (product.CategoryId?.toString() || '') ? "selected" : "" %> ><%= category.name %></option>
                             <% } %>
                         </select>
-                    </div>
-                    
+                    </div>  
+               
                   <hr>
                 </div>
 
-                
-            </div> <!-- card end// -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4>Media</h4>
-                </div>
-                <div class="card-body">
-                    <div class="input-upload">
-                        <img src="<%= product.images[0] %>" alt="No Image">
-                        <input class="form-control" name="images" type="file" multiple>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Media</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-upload">
+                            <!-- Image preview will be displayed here -->
+                            <img id="imagePreview" src="<%= product.images[0] %>" alt="Selected Image">
+                         
+                            <input class="form-control" id="imageInput" name="images" type="file" multiple onchange="previewImages(event)">
+                          <br>  <select id="imageSelector" class="form-select" onchange="showSelectedImage()">
+                                <option value="-1">Not Selected    </option>
+                            </select>
+                            <label id="imageSelectorLabel" for="imageInput"></label>
+                        </div>
                     </div>
                 </div>
-            </div> 
-            <div>
-                <button class="btn btn-light rounded font-sm mr-5 text-body hover-up"><a href="/admin/product/draft">Save to draft</a></button>
-                <button type="submit" class="btn btn-md rounded font-sm hover-up">Publish</button>
+            
+                    <div>
+               
+                <button type="submit" class="btn btn-md rounded font-sm hover-up">Update</button>
             </div>
         </form>
         </div>
     </div>
 </section>
 
+<script>
+    function previewImages(event) {
+        var selector = document.getElementById("imageSelector");
+        var preview = document.getElementById("imagePreview");
+        var files = event.target.files;
+
+        selector.innerHTML = "<option value='-1'>Select Image</option>";
+
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var option = document.createElement("option");
+                option.text = files[i].name;
+                option.value = i;
+                selector.add(option);
+            }
+
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                preview.src = event.target.result;
+            }
+
+            reader.readAsDataURL(files[0]); // Preview the first selected image
+        } else {
+            // If no image is selected, clear the preview
+            preview.src = "assets/imgs/theme/upload.svg";
+        }
+    }
+
+    function showSelectedImage() {
+        var selector = document.getElementById("imageSelector");
+        var preview = document.getElementById("imagePreview");
+        var files = document.getElementById("imageInput").files;
+
+        var selectedIndex = parseInt(selector.value);
+
+        if (selectedIndex >= 0 && selectedIndex < files.length) {
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                preview.src = event.target.result;
+            }
+
+            reader.readAsDataURL(files[selectedIndex]);
+        } else {
+            preview.src = "assets/imgs/theme/upload.svg";
+        }
+    }
+</script>
 
 <%- include("./partials/adminFooter") %>
