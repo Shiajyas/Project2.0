@@ -26,16 +26,29 @@ const validatingRules = [
 
  
 // validation.js
+// function filedCheker(obj) {
+//   for (const key in obj) {
+//     if (obj.hasOwnProperty(key)) {
+//       const value = obj[key];
+//       if (value === null || value === undefined) {
+//         return false; // Found a field that fails the check
+//       }
+//     }
+//   }
+//   return true; // All fields pass the check
+// }
+
 function filedCheker(obj) {
+  const missingFields = [];
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const value = obj[key];
-      if (value === null || value === undefined) {
-        return false; // Found a field that fails the check
+      if (value === null || value === undefined || value === '') {
+        missingFields.push(key); // Add the missing field to the array
       }
     }
   }
-  return true; // All fields pass the check
+  return missingFields; // Return the array of missing fields
 }
 
 

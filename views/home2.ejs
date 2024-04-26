@@ -253,21 +253,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-3">
-                        <div class="widget-category mb-30">
-                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
-                            <ul class="categories">
-                                <% products.forEach(product => { %>
-                                    <% if (Array.isArray(product.categoryD)) { %>
-                                        <% product.categoryD.forEach(category => { %>
-                                            <li><a href="<%= category.link %>"><%= category.name %></a></li>
-                                        <% }) %>
-                                    <% } else { %>
-                                        <li><a href="<%= product.categoryD.name %>"><%= product.categoryD.name %></a></li>
-                                    <% } %>
-                                <% }) %>
-                            </ul>
-                            
-                        </div>
+                   
                         <div class="widget-category mb-30">
                             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Sort by</h5>
                             <ul class="categories">
@@ -358,7 +344,7 @@
                                                        
                                                     </div>
                                                     <div class="product-action-1 show">
-                                                        <a aria-label="Add To Cart" class="action-btn hover-up" href="<%= product.cartLink %>"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                 <button onclick="addToCart('<%= product._id%>')" > <i class="fi-rs-shopping-bag-add"></i> </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2478,7 +2464,53 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        function addToCart(prodId) {
+            
+            var stock = 1;
+            $.ajax({
+                url: `/user/addcart?id=${prodId}`,
+                method: "post",
+                data: {
+                    stock: stock
+                },
+                success: (res) => {
+                    if (res.status === true) {
+
+                        Swal.fire({
+                            title: 'Added to Cart!',
+                            text: 'Continue Shopping',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        })
+                    } else if (res.status === "Out of stock") {
+                        Swal.fire({
+                            title: 'Stock!!',
+                            text: "The product is out of stock",
+                            icon: 'error', // Corrected from 'fail' to 'error'
+                            timer: 2000,
+                        })
+                    } else {
+                        Swal.fire({
+                            title: 'You need to Login first',
+                            text: 'Continue Shopping',
+                            icon: 'warning',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => { window.location.href = '/user/login' });
+                    }
+                },
+                error: (err) => {
+                    console.error(err, "hello");
+                    alert("error occured")
+                }
+            });
+        }
+    </script>
     <!-- Vendor JS-->
+   
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
     <script src="assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>

@@ -1,5 +1,6 @@
 const User = require("../models/UserDb");
 const Category = require("../models/categoryData")
+const { v4: uuidv4 } = require("uuid");
 const Product = require("../models/productData")
 const {validatingRules,signToken, filedCheker}= require("../utils/authHandler")
 const asyncHandler = require('express-async-handler');
@@ -21,43 +22,137 @@ const userSignup = (req,res)=>{
 }
 
 const userSignupPost = [
-    validatingRules,
-    asyncHandler(async (req, res) => {
-   
+  validatingRules,
+  asyncHandler(async (req, res) => {
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
-        const errorArray = errors.array().map((err) => err.msg);
-      
-        return res.status(401).render('signup', { error: errorArray, successMsg: '' });
+          const errorArray = errors.array().map((err) => err.msg);
+          return res.status(401).render('signup', { error: errorArray, successMsg: '' });
       } else {
-        const { username, email,contact, password, cpassword } = req.body;
-        
-        console.log(req.body);
- 
-        try {
-          const newUser = await User.create({ username, email,contact, password, cpassword });
+          const { username, email, contact, password, cpassword } = req.body;
+          console.log(email);
+
+          const findUser = await User.findOne({ email });
+
+          if (password === cpassword) {
+              if (!findUser) {
+                  let otp = otpGenerator();
+                  console.log(otp);
+
+                  // Prepare and send email with the OTP
+                  const message = `We have received a password reset request. Your OTP is: ${otp}`;
+                  const info = await sendEmail({
+                      email: email,
+                      subject: "Password Reset OTP",
+                      message: message,
+                      html: `<b> <h4>Your OTP ${otp}</h4> <br> <a href="">Click here</a></b>`,
+                  });
+
+                  if (info) {
+                      req.session.userOtp = otp;
+                      req.session.userData = req.body;
+                      console.log( req.session.userData);
+                      res.render("verify-otp", { email });
+                      console.log("Email sented", info.messageId);
+                  } else {
+                    console.error("Error sending email:", info); 
+                      return res.status(500).json({ error: "email-error" });
+                  }
+              } else {
+                  return res.status(401).render('signup', { error: ['Email already registered'], successMsg: '' });
+              }
+          } else {
+              return res.status(401).render('signup', { error: ['Passwords do not match'], successMsg: '' });
+          }
+      }
+  })
+];
+
+const resendOtp = async (req, res) => {
+  try {
+      const email = req.session.userData.email;
+      var newOtp = otpGenerator();
+      console.log(email, newOtp);
+
+
+                  // Prepare and send email with the OTP
+                  const message = `We have received a password reset request. Your OTP is: ${otp}`;
+                  const info = await sendEmail({
+                      email: email,
+                      subject: "Password Reset OTP",
+                      message: message,
+                      html: `<b> <h4>Your OTP ${newOtp}</h4> <br> <a href="">Click here</a></b>`,
+                  });
+
+      if (info) {
+          req.session.userOtp = newOtp;
+          res.render("verify-otp", { email });
+          console.log("Email resent", info.messageId);
+      } else {
+          res.json({ success: false, message: 'Failed to resend OTP' });
+      }
+  } catch (error) {
+      console.log(error.message);
+      res.json({ success: false, message: 'Error in resending OTP' });
+
+  }
+}
+
+
+const verifyOtp = async (req, res) => {
+  try {
+
+      //get otp from body
+      const { otp } = req.body
+      if (otp === req.session.userOtp) {
+          const user = req.session.userData
+          const referalCode = uuidv4()
+          console.log("the referralCode  =>" + referalCode);
+         console.log("ve",user.username)
+          const newUser = new User({
+              username: user.username,
+              email: user.email,
+              contact: user.contact,
+              password: user.password,
+              referalCode : referalCode
+          })
           const token = signToken(newUser._id);
           const tokenWithBearer = `Bearer ${token}`
   
           console.log(newUser); 
           console.log(token);
-          return res.status(200).render('signup', { successMsg: 'Signup successful', error: [] });
-        } catch (error) {
-          console.error(error);
-  
-          if (error.name === 'ValidationError' && error.errors.email.kind === 'unique') {
-            return res.status(500).render('signup', { error: ['Oops! Something went wrong.'], successMsg: '' });
-          } else {
-            return res.status(401).render('signup', { error: ['Email already registered'], successMsg: '' });
-          }
-        }
+          await newUser.save()
+
+          req.session.user = newUser._id
+
+          return res.status(200).render('login', { error: ['Signup success'], successMsg: '' });
+       
+      } else {
+
+          console.log("otp not matching");
+          res.json({ status: false })
       }
-    })
-  ];
-  
+
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
+
+  //Generate OTP
+
+function otpGenerator() {
+  const digits = "1234567890"
+  var otp = ""
+  for (i = 0; i < 6; i++) {
+      otp += digits[Math.floor(Math.random() * 10)]
+  }
+  return otp
+}
   
   const userLoginPost = asyncHandler(async (req, res, next) => {
+    console.log(req.user);
     const { email, password } = req.body;
    
     if (!email || !password) {
@@ -71,7 +166,7 @@ const userSignupPost = [
             return res.status(401).render("login", { error: ['Invalid email or password..'], successMsg: '' });
         }
         
-        if(newUser.blocked) {
+        if(newUser.isBlocked) {
             return res.status(401).render("login", { error: ['Your account is blocked. Please contact support.'], successMsg: '' });
         }
 
@@ -99,13 +194,11 @@ const userSignupPost = [
 });
 
   const userLogin = (req, res) => {
-  
+  console.log(req.user);
    return res.status(200).render('login', { error: [''], successMsg: '' });
   };
 
 
-
-  
 // Protect middleware
 const protectRules = asyncHandler(async (req, res, next) => {
     try {
@@ -191,75 +284,106 @@ const protectRules = asyncHandler(async (req, res, next) => {
 
   const forgetPasswordPost = asyncHandler(async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.body.email });
-  
-      if (!user) {
-       
-        return res.status(401).render("restpass",{ error: ["This email is not registered"], successMsg: '' });
-      }
-  
-      const otp = user.otpGenerator();
-      console.log(otp);
-  
-      await user.save({ validateBeforeSave: false });
-  
-      // Prepare and send email with the OTP
-      const message = `We have received a password reset request. Your OTP is: ${otp}`;
-      await sendEmail({
-        email: user.email,
-        subject: "Password Reset OTP",
-        message: message,
-      });
-  
-      
-      return res.status(200).render("restpass",{ error: [], successMsg: `OTP send to ${user.email}` });;
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).render("restpass", { error: ["This email is not registered"], successMsg: '' });
+        }
+
+        const otp = otpGenerator();
+        console.log("Generated OTP2:", otp);
+
+        user.otp = otp;
+        user.otpExpires = Date.now() + 600000; // Set OTP expiry to 10 minutes
+        await user.save({ validateBeforeSave: false });
+
+        // Prepare and send email with the OTP
+        const message = `We have received a password reset request. Your OTP2 is: ${otp}`;
+        const info = await sendEmail({
+            email: user.email,
+            subject: "Password Reset OTP",
+            message: message,
+        });
+
+        if (info) {
+            req.session.userEmail = user.email;
+            req.session.userOtp = otp;
+            return res.status(200).render("fverify-otp", { email: user.email });
+        } else {
+            console.error("Error sending email:", info);
+            return res.status(500).render("restpass", { error: ["Server error. Unable to generate OTP"], successMsg: '' });
+        }
     } catch (error) {
-      console.error(error);
-     
-      return res.status(500).render("restpass",{ error: ["Server error. Unable to generate OTP"], successMsg: '' });
+        console.error(error);
+        return res.status(500).render("restpass", { error: ["Server error. Unable to generate OTP"], successMsg: '' });
     }
-  });
-  
-  
+});
+
+const fVerifyOtp = asyncHandler(async (req, res) => {
+    try {
+
+        const { otp } = req.body;
+        const userEmail = req.session.userEmail;
+        const userOtp = req.session.userOtp;
+        const referalCode = uuidv4()
+        console.log("the referralCode2  =>" + referalCode);
+        console.log(userOtp);
+
+        if (otp === userOtp) {
+            return res.status(200).render('restpassF', { error: [], successMsg: '' });
+        } else {
+            console.log("OTP mismatch");
+            return res.status(401).render('restpass', { error: ['OTP mismatch'], successMsg: '' });
+        }
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).render("restpass", { error: ["Server error. Unable to verify OTP"], successMsg: '' });
+    }
+});
+
 const resetPasswordPost = asyncHandler(async (req, res) => {
     try {
-      const user = await User.findOne({
-        email: req.body.email,
-        otpExpires: { $gt: Date.now() },
-      });
-  
-      const {password,cpassword} = req.body
-      if(password !== cpassword){
-        return res.status(401).render("restpass",{ error: ["Passeord donsn't match"], successMsg: '' }); 
-      }
-  
-      console.log(user);
+        const  email  = req.session.userEmail;
+        console.log(email);
+        const user = await User.findOne({
+            email,
+          
+        });
 
-      if (!user) {
-      return res.status(400).render("restpass",{ error: ["Invalid OTP or OTP has expired"], successMsg: '' });
-      }
-  
-      const isMatch = await bcrypt.compare(req.body.otp, user.encryptedOTP);
-  
-      if (!isMatch) {
-        return res.status(400).render("restpass",{ error: ["Invalid OTP or OTP has expired"], successMsg: '' });
+        if (!user) {
+            return res.status(400).render("restpass", { error: ["Invalid OTP or OTP has expired"], successMsg: '' });
+        }
+
+        const { password, cpassword } = req.body;
+        if (password !== cpassword) {
+            return res.status(401).render("restpass", { error: ["Passwords don't match"], successMsg: '' });
+        }
+
+        // Reset user password and other necessary fields
+        user.password = password;
+        user.confirmPassword = cpassword;
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        user.passwordChangedAt = Date.now();
+
+        await user.save();
+
+        // Clear session data after password reset
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error destroying session:", err);
+            }
+        });
+        return res.status(200).render('login', { error: ['Password successfully updated. You can now log in.'], successMsg: '' });
        
-      }
-  
-      // Reset user password and other necessary fields
-      user.password = req.body.password;
-      user.confirmPassword = req.body.cpassword;
-      user.encryptedOTPotp = undefined;
-      user.otpExpires = undefined;
-      user.passwordChangedAt = Date.now();
-  
-      await user.save();
-      return res.render("login",{ error: ["Password successfully updated"], successMsg: '' })
+        
     } catch (error) {
-      console.error(error);
-      return res.status(500).render("restpass",{ error: ["Server error. Unable to reset password"], successMsg: '' });
+        console.error(error);
+        return res.status(500).render("restpassF", { error: ["Server error. Unable to reset password"], successMsg: '' });
     }
-  });
+});
+
 
   const adminLogout = (req,res)=>{
     res.cookie("token","", {maxAge:1})
@@ -422,6 +546,9 @@ module.exports = {
     getUserProductDetails,
     productSortL_H,
     productSortH_L,
-    productSortAVG
+    productSortAVG,
+    verifyOtp,
+    resendOtp,
+    fVerifyOtp
   };
   

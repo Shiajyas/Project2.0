@@ -1,5 +1,6 @@
 const express = require("express");
 const authRouterUser = express.Router();
+const {upload} = require("../utils/imageUploader");
 const passport = require("passport");
 require("../utils/passport");
 
@@ -27,7 +28,26 @@ authRouterUser.get("/auth/google/callback", passport.authenticate("google", {
   failureRedirect: "/user/login"
 }));
 
+// user Profile Routes
 
+const {
+getUserProfile,
+getAddUserProfile,
+postAddress,
+getEditUserProfile,
+editUserProfile,
+getDeleteAddress
+} = require("../controller/userProfileController")
+
+// user cart routes
+
+const {
+getCartPage,
+addToCart
+} = require("../controller/cartController")
+
+
+// user auth routes
 const {
   userSignup,
   userSignupPost,
@@ -43,7 +63,10 @@ const {
   getUserProductDetails,
   productSortL_H,
   productSortH_L,
-  productSortAVG
+  productSortAVG,
+  verifyOtp,
+  resendOtp,
+  fVerifyOtp
 } = require("../controller/userAuthController")
 
 authRouterUser.get('/signup',userSignup); // GET request to render the signup form
@@ -53,6 +76,10 @@ authRouterUser.get('/login',userLogin)
 authRouterUser.get("/logout",userLogout) 
 authRouterUser.get("/forgetPassword",forgetPassword)
 authRouterUser.post("/forgetPassword",forgetPasswordPost)
+authRouterUser.post("/forget_verify-otp", fVerifyOtp)
+authRouterUser.post("/forget_resendOtp", resendOtp)
+authRouterUser.post("/verify-otp", verifyOtp)
+authRouterUser.post("/resendOtp", resendOtp)
 authRouterUser.post("/resetPassword",resetPasswordPost)
 // authRouterUser.get("/home",protectRules,restrict("user","admin"),getUserHome)
 authRouterUser.get("/product/detail",protectRules,restrict("user","admin"),getUserProductDetails)
@@ -71,6 +98,19 @@ failureRedirect: "/user/login"
 }))
 
 
+//User profile Routes 
+getDeleteAddress
+authRouterUser.get("/profile",protectRules,restrict("user","admin"), getUserProfile)
+authRouterUser.get("/addAddress",protectRules,restrict("user","admin"), getAddUserProfile)
+authRouterUser.post("/addAddress",protectRules,restrict("user","admin"), upload.array("images",1),postAddress)
+authRouterUser.get("/addAddress",protectRules,restrict("user","admin"), getAddUserProfile)
+authRouterUser.get("/editAddress",protectRules,restrict("user","admin"), getEditUserProfile)
+authRouterUser.post("/editAddress",protectRules,restrict("user","admin"), editUserProfile)
+authRouterUser.get("/deleteAddress",protectRules,restrict("user","admin"), getDeleteAddress)
+
+// cart routes
+authRouterUser.get("/cart",protectRules,restrict("user","admin"), getCartPage)
+authRouterUser.post("/addcart",protectRules,restrict("user","admin"),addToCart)
 
 module.exports = authRouterUser;
 

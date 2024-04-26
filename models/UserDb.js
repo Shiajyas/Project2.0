@@ -4,11 +4,7 @@ const bcrypt = require("bcryptjs");
 const otpGenerator = require('otp-generator');
 
 const userSchema = mongoose.Schema({
-  id: {
-    type: String,
-    unique: true,
-    required: false
-},
+
   username: {
     type: String,
     required: false,
@@ -23,27 +19,11 @@ const userSchema = mongoose.Schema({
   contact:{
   type: Number
 
-  },
-  district:{
-    type: String
-  
-    },
-    
-  state:{
-    type: String
-  
-    },
-    pincode:{
-      type: Number
-    
-      },
+  }, addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'address' }], // Reference to Address schema
     
         country:{
           type: String
         
-          },
-          adreess:{
-            type: String
           },
           status:{
             type:String
@@ -55,7 +35,7 @@ const userSchema = mongoose.Schema({
             type:Number
           }, 
 
-  photo: String,
+  images: Array,
   role: {
     type: String,
     enum: ["user", "admin"],
@@ -66,6 +46,16 @@ const userSchema = mongoose.Schema({
    
     minlength: 8,
     select: false,
+  },
+  cart: {
+      type: Array
+  },
+  wishlist: {
+      type: Array
+  },
+  referalCode: {
+      type: String,
+     
   },
   cpassword: {
     type: String,

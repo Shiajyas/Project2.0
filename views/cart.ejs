@@ -1,0 +1,438 @@
+<%- include('./partials/header') %>
+
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Your Cart
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-9">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center clean">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <% if (data.length> 0) { %>
+                                        <% var x=0 %>
+                                            <% for (let i=0; i < data.length;i++) { %>
+
+                                                <tr>
+                                                    <td class="image product-thumbnail">
+                                                        <img src="<%= data[i].productDetails[0].images[1] %>"
+                                                            alt="#" />
+                                                    </td>
+                                                    <td class="product-des product-name">
+                                                        <h5 class="product-name">
+                                                            <a href="shop-product-right.html">
+                                                                <%= data[i].productDetails[0].name %>
+                                                            </a>
+                                                        </h5>
+                                                        <p class="font-xs">
+                                                            <%= data[i].productDetails[0].category %><br />
+                                                                <%= data[i].productDetails[0].brand %>.
+                                                        </p>
+                                                    </td>
+                                                    <td class="price" data-title="Price">₹<span> <text
+                                                                id="subTotal<%= data[i].productDetails[0].id %>">
+                                                                <%= data[i].productDetails[0].price * data[i].stock %>
+                                                            </text><br>
+                                                            <small class="text-muted text-nowrap">₹<span id="price">
+                                                                    <%= data[i].productDetails[0].price %>
+
+                                                                </span>
+                                                                / per item </small>
+
+                                                    </td>
+                                                    <% console.log(data[i].productDetails[0].salePrice * data[i].quantity,"qqqq"); %>
+
+                                                        <% x +=data[i].productDetails[0].salePrice * data[i].quantity%>
+
+
+                                                            <td class="text-center" data-title="Stock">
+                                                                <div class="detail-qty border radius m-auto">
+                                                                    <div class="quantity-control">
+
+
+                                                                        <script>
+
+                                                                        </script>
+                                                                        <button class="btn btn-sm increment-button"
+                                                                            onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].stock%>', 1, '<%= data[i].productDetails[0].price %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">+</button>
+
+
+                                                                        <input class="quantity-input"
+                                                                            id="cartProductQuantity<%= data[i].productDetails[0].id %>"
+                                                                            value="<%= data[i].stock %>"
+                                                                            style="width: 45px;" type="text" readonly
+                                                                            value="">
+
+
+
+                                                                        <button class="btn btn-sm decrement-button"
+                                                                            onclick="changeQuantity('<%= data[i].productDetails[0]._id %>', '<%= data[i].stock%>', -1, '<%= data[i].productDetails[0].price %>',  '<%= data[i].productDetails[0].id %>', '<%= data[i].productDetails[0].quantity%>')">-</button>
+
+
+
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+
+
+
+                                                            <td class="action text-center" data-title="Remove">
+                                                                <a class="btn btn-sm"
+                                                                    href="/deleteItem?id=<%= data[i].productDetails[0]._id %>">
+                                                                    <i class="fi-rs-trash"></i>
+                                                                </a>
+                                                            </td>
+
+
+
+
+                                                            <% } %>
+                                                                <% } else { %>
+                                                <tr>
+
+                                                    <td colspan="2" class="text-center">
+                                                        <p class="lead mb-4">No item found in Cart</p>
+                                                    </td>
+
+
+                                                </tr>
+                                                <% } %>
+                                                    <% console.log(x,"xxx"); %>
+
+                                                        <input type="hidden" name="" id="totalabc" value="<%= x  %>">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="border p-md-4 p-30 border-radius cart-totals">
+                            <div class="heading_s1 mb-3">
+                                <h4>PRICE DETAILS</h4>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tbody>
+
+                                        <tr>
+                                            <td class="cart_total_label">Shipping</td>
+                                            <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="cart_total_label">Total</td>
+                                            <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">₹
+                                                    <text id="total">
+                                                        <%= grandTotal %>
+                                                    </text>
+                                                </span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <a href="/checkout?userId=<%= user._id %>" class="btn "> <i class="fi-rs-box-alt mr-10"></i>
+                                Proceed To CheckOut</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            </div>
+            </div>
+            </div>
+        </section>
+    </main>
+
+
+
+    <script>
+        function changeQuantity(productId, cartQuantity, count, productPrice, i, productQuantity) {
+            
+            // alert(productPrice)
+            // alert(cartQuantity)
+            // alert(i)
+
+            const abc = document.getElementById("totalabc").value
+            console.log(abc, "hi");
+            console.log(productId, cartQuantity, count, productPrice, i, productQuantity);
+            const cartProductQuantityElement = document.querySelector(`#cartProductQuantity${i}`)
+            // alert('quantity')
+            // alert(cartProductQuantityElement.value,'quantity')
+            const subtotalElement = document.querySelector(`#subTotal${i}`);
+            // alert(subtotalElement.innerHTML,"subelm")
+            const totalElements = document.getElementById('total').innerHTML;
+            // alert(parseInt(subtotalElement.innerHTML)+ parseInt(productPrice))
+
+         
+          
+
+            let currentQuantity = parseInt(cartProductQuantityElement.value)
+            
+            const currentSubTotal = parseInt(subtotalElement.innerHTML)
+            // alert(currentSubTotal+"sub")
+
+            // alert(currentTotal+"total")
+
+            const newQuantity = currentQuantity + count
+            // alert(newQuantity)
+
+            if (count === -1 && newQuantity < 1) {
+                return; 
+            }
+
+            if(currentSubTotal < currentSubTotal){
+                return
+            }
+
+            if (count == 1 && newQuantity > productQuantity) {
+
+
+                Swal.fire({
+                    title: 'STOCK!',
+                    text: 'Product is out of stock.',
+                    icon: 'error',
+                    timer: 5000
+                })
+                return
+            }
+
+            const newSubtotal = newQuantity * productPrice
+            if (count == 1) {
+                // alert('1')
+                document.getElementById(`subTotal${i}`).innerHTML = parseInt(subtotalElement.innerHTML) + parseInt(productPrice)
+            } else {
+                // alert('else')
+                document.getElementById(`subTotal${i}`).innerHTML = parseInt(subtotalElement.innerHTML) - parseInt(productPrice)
+            }
+
+
+
+            // alert('in starting '+newTotal)
+            $.ajax({
+                url: '/changeQuantity',
+                method: 'POST',
+                data: {
+                    productId: productId,
+                    quantity: newQuantity,
+                    count: count
+                },
+
+                success: (response) => {
+                    //   alert('sucess')
+                    // location.reload()
+
+
+                    let currentQuantity = parseInt(cartProductQuantityElement.value)
+                    // alert(currentQuantity,"currQua")
+                    let currentSubTotal = parseInt(subtotalElement.value)
+                    // alert(subtotalElement.value,"subttl")
+                    // alert(currentTotal,"ctotal")
+                    document.getElementById(`cartProductQuantity${i}`).value = currentQuantity + count
+
+                    document.getElementById(`subTotal${i}`).value = currentSubTotal * count
+                    // alert(parseInt(abc) + parseInt(response.totalAmount),"helloooooooooooooooooooo")
+                    if (response.count == 1) {
+                        console.log("TOtal Element == >" , totalElements)
+                        document.getElementById(`total`).innerHTML = parseInt(totalElements) + parseInt(response.totalAmount)
+                    } else {
+                        document.getElementById(`total`).innerHTML = parseInt(totalElements) - parseInt(response.totalAmount)
+
+                    }
+
+
+                },
+                error: (error) => {
+                    // alert(error)    
+                }
+            })
+        }
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+<footer class="main">
+    <section class="newsletter p-30 text-white wow fadeIn animated">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 mb-md-3 mb-lg-0">
+                    <div class="row align-items-center">
+                        <div class="col flex-horizontal-center">
+                            <img class="icon-email" src="assets/imgs/theme/icons/icon-email.svg" alt="">
+                            <h4 class="font-size-20 mb-0 ml-3">Sign up to Newsletter</h4>
+                        </div>
+                        <div class="col my-4 my-md-0 des">
+                            <h5 class="font-size-15 ml-4 mb-0">...and receive <strong>$25 coupon for first shopping.</strong></h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <!-- Subscribe Form -->
+                    <form class="form-subcriber d-flex wow fadeIn animated">
+                        <input type="email" class="form-control bg-white font-small" placeholder="Enter your email">
+                        <button class="btn bg-dark text-white" type="submit">Subscribe</button>
+                    </form>
+                    <!-- End Subscribe Form -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section-padding footer-mid">
+        <div class="container pt-15 pb-20">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="widget-about font-md mb-md-5 mb-lg-0">
+                        <div class="logo logo-width-1 wow fadeIn animated">
+                            <a href="index.html"><img src="assets/imgs/theme/logo.svg" alt="logo"></a>
+                        </div>
+                        <h5 class="mt-20 mb-10 fw-600 text-grey-4 wow fadeIn animated">Contact</h5>
+                        <p class="wow fadeIn animated">
+                            <strong>Address: </strong>562 Wellington Road, Street 32, San Francisco
+                        </p>
+                        <p class="wow fadeIn animated">
+                            <strong>Phone: </strong>+01 2222 365 /(+91) 01 2345 6789
+                        </p>
+                        <p class="wow fadeIn animated">
+                            <strong>Hours: </strong>10:00 - 18:00, Mon - Sat
+                        </p>
+                        <h5 class="mb-10 mt-30 fw-600 text-grey-4 wow fadeIn animated">Follow Us</h5>
+                        <div class="mobile-social-icon wow fadeIn animated mb-sm-5 mb-md-0">
+                            <a href="#"><img src="assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                            <a href="#"><img src="assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                            <a href="#"><img src="assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                            <a href="#"><img src="assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                            <a href="#"><img src="assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <h5 class="widget-title wow fadeIn animated">About</h5>
+                    <ul class="footer-list wow fadeIn animated mb-sm-5 mb-md-0">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Delivery Information</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms &amp; Conditions</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Support Center</a></li>
+                        <li><a href="/admin/login">Administrator</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2  col-md-3">
+                    <h5 class="widget-title wow fadeIn animated">My Account</h5>
+                    <ul class="footer-list wow fadeIn animated">
+                        <li><a href="/user/signup">Sign In</a></li>
+                        <li><a href="#">View Cart</a></li>
+                        <li><a href="#">My Wishlist</a></li>
+                        <li><a href="#">Track My Order</a></li>
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">Order</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="widget-title wow fadeIn animated">Install App</h5>
+                    <div class="row">
+                        <div class="col-md-8 col-lg-12">
+                            <p class="wow fadeIn animated">From App Store or Google Play</p>
+                            <div class="download-app wow fadeIn animated">
+                                <a href="#" class="hover-up mb-sm-4 mb-lg-0"><img class="active" src="assets/imgs/theme/app-store.jpg" alt=""></a>
+                                <a href="#" class="hover-up"><img src="assets/imgs/theme/google-play.jpg" alt=""></a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-12 mt-md-3 mt-lg-0">
+                            <p class="mb-20 wow fadeIn animated">Secured Payment Gateways</p>
+                            <img class="wow fadeIn animated" src="assets/imgs/theme/payment-method.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="container pb-20 wow fadeIn animated">
+        <div class="row">
+            <div class="col-12 mb-20">
+                <div class="footer-bottom"></div>
+            </div>
+            <div class="col-lg-6">
+                <p class="float-md-left font-sm text-muted mb-0">&copy; 2022, <strong class="text-brand">Evara</strong> - HTML Ecommerce Template </p>
+            </div>
+            <div class="col-lg-6">
+                <p class="text-lg-end text-start font-sm text-muted mb-0">
+                    Designed by <a href="http://alithemes.com/" target="_blank">Alithemes.com</a>. All rights reserved
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- Preloader Start -->
+<div id="preloader-active">
+    <div class="preloader d-flex align-items-center justify-content-center">
+        <div class="preloader-inner position-relative">
+            <div class="text-center">
+                <h5 class="mb-10">Now Loading</h5>
+                <div class="loader">
+                    <div class="bar bar1"></div>
+                    <div class="bar bar2"></div>
+                    <div class="bar bar3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Vendor JS-->
+<script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+<script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
+<script src="assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
+<script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/plugins/slick.js"></script>
+<script src="assets/js/plugins/jquery.syotimer.min.js"></script>
+<script src="assets/js/plugins/wow.js"></script>
+<script src="assets/js/plugins/jquery-ui.js"></script>
+<script src="assets/js/plugins/perfect-scrollbar.js"></script>
+<script src="assets/js/plugins/magnific-popup.js"></script>
+<script src="assets/js/plugins/select2.min.js"></script>
+<script src="assets/js/plugins/waypoints.js"></script>
+<script src="assets/js/plugins/counterup.js"></script>
+<script src="assets/js/plugins/jquery.countdown.min.js"></script>
+<script src="assets/js/plugins/images-loaded.js"></script>
+<script src="assets/js/plugins/isotope.js"></script>
+<script src="assets/js/plugins/scrollup.js"></script>
+<script src="assets/js/plugins/jquery.vticker-min.js"></script>
+<script src="assets/js/plugins/jquery.theia.sticky.js"></script>
+<script src="assets/js/plugins/jquery.elevatezoom.js"></script>
+<!-- Template  JS -->
+<script src="assets/js/maind134.js?v=3.4"></script>
+<script src="assets/js/shopd134.js?v=3.4"></script>
+
+
+</body>
+
+
+<!-- Mirrored from wp.alithemes.com/html/evara/evara-frontend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Jul 2023 10:09:48 GMT -->
+</html>

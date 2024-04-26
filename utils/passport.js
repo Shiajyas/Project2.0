@@ -29,6 +29,6 @@ passport.use(new GoogleStrategy({
     passReqToCallback: true
 }, (request, accessToken, refreshToken, profile, done) => {
     const userName = profile.displayName;
-    console.log(userName);
+    
     return done(null, profile);
 }));

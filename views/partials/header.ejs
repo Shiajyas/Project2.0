@@ -13,7 +13,6 @@
     <meta property="og:type" content="">
     <meta property="og:url" content="">
     <meta property="og:image" content="">
-
     
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
@@ -220,7 +219,7 @@
                                     </ul>
                                 </li>
                                 <% if (user) { %>
-                                    <li><i class="fi-rs-user"></i><a href="#"><%= user.username %></a></li>
+                                    <li><i class="fi-rs-user"></i><a href="/user/profile">.<%= user.username %></a></li>
                                     <li><a href="/user/logout">Logout</a></li>
                                 <% } else { %>
                                     <li><i class="fi-rs-user"></i><a href="/user/signup">Log In / Sign Up</a></li>
@@ -266,7 +265,7 @@
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2">
-                                    <a class="mini-cart-icon" href="shop-cart.html">
+                                    <a class="mini-cart-icon" href="/user/cart">
                                         <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg">
                                         <span class="pro-count blue">2</span>
                                     </a>
@@ -302,7 +301,7 @@
                                                 <h4>Total <span>$4000.00</span></h4>
                                             </div>
                                             <div class="shopping-cart-button">
-                                                <a href="shop-cart.html" class="outline">View cart</a>
+                                                <a href="/user/cart" class="outline">View cart</a>
                                                 <a href="shop-checkout.html">Checkout</a>
                                             </div>
                                         </div>
@@ -532,7 +531,7 @@
                                             </li>
                                             <li><a href="shop-filter.html">Shop – Filter</a></li>
                                             <li><a href="shop-wishlist.html">Shop – Wishlist</a></li>
-                                            <li><a href="shop-cart.html">Shop – Cart</a></li>
+                                            <li><a href="/user/cart">Shop – Cart</a></li>
                                             <li><a href="shop-checkout.html">Shop – Checkout</a></li>
                                             <li><a href="shop-compare.html">Shop – Compare</a></li>
                                         </ul>
@@ -641,7 +640,7 @@
                                 </a>
                             </div>
                             <div class="header-action-icon-2">
-                                <a class="mini-cart-icon" href="shop-cart.html">
+                                <a class="mini-cart-icon" href="/user/cart">
                                     <img alt="Evara" src="assets/imgs/theme/icons/icon-cart.svg">
                                     <span class="pro-count white">2</span>
                                 </a>
@@ -677,7 +676,7 @@
                                             <h4>Total <span>$383.00</span></h4>
                                         </div>
                                         <div class="shopping-cart-button">
-                                            <a href="shop-cart.html">View cart</a>
+                                            <a href="/user/cart">View cart</a>
                                             <a href="shop-checkout.html">Checkout</a>
                                         </div>
                                     </div>
