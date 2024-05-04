@@ -94,7 +94,7 @@ const postAddress = async (req, res) => {
         }));
 
         // Update user's name and images
-        await User.findByIdAndUpdate(userId, { username, images: processedImages });
+        await User.findByIdAndUpdate(userId, { images: processedImages });
 
         // Find the address document associated with the user
         const userAddress = await Address.findOne({ userId: userId });
@@ -245,7 +245,27 @@ const getDeleteAddress = async (req, res) => {
     }
 };
 
+const editUserDetails = async(req,res)=>{
+ try {
+    const userId = req.query.id
+    const {username,contact} = req.body
+    console.log(userId,username,contact)
+    const fields = { username,contact };
+    const missingFields = filedCheker(fields);
+    if (missingFields.length > 0) {
+        const errorMessage = `Missing fields: ${missingFields.join(', ')}`;
+        req.flash("edit", errorMessage);
+        return res.status(400).redirect("/user/profile");
+    }
 
+    await User.findByIdAndUpdate(userId,{username,contact})
+    req.flash("edit", "Username and Phone number updated");
+    return res.status(200).redirect("/user/profile");
+ } catch (error) {
+    console.log(error.message)
+    return res.status(500).render("404")
+ }
+}
 
 
 
@@ -256,5 +276,5 @@ module.exports = {
     getEditUserProfile,
     editUserProfile,
     getDeleteAddress,
-    
+    editUserDetails
 }

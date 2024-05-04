@@ -12,7 +12,7 @@ const addressSchema = Mongoose.Schema({
         },
         username: {
             type: String,
-            required: true
+            // required: true
         },
         city: {
             type: String,
@@ -25,7 +25,7 @@ const addressSchema = Mongoose.Schema({
         state: {
             type: String,
             required: true
-        },
+        }, 
         pincode: {
             type: Number,
             required: true

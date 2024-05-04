@@ -1,5 +1,14 @@
 <%- include('./partials/header') %>
 
+<style>
+    .alert {
+    margin: 0 auto; /* Center align horizontally */
+    width: fit-content; /* Make the width fit content */
+    align-items: self-end;
+}
+</style>
+
+
     <main class="main">
         <div class="page-header breadcrumb-wrap">
             <div class="container">
@@ -10,17 +19,20 @@
                 </div>
             </div>
         </div>
+      
         <section class="pt-150 pb-150">
-            <div class="container">
-                <div class="col-md-3">
+         
+            <div class="container ">
+                <div class="col-md-5 text-center">
                     <% if (success && success.length > 0) { %>
                         <!-- Display success messages -->
-                        <div class="alert alert-dismissible font-weight-bold font-weight-bold  " style="color: rgb(243, 35, 21);" alert">
+                        <div class="alert alert-dismissible font-weight-bold" style=" border: 1px solid black; ;">
                             <p><%= success[0] %></p> <!-- Display only the first success message -->
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <% } %>
-                    </div>
+                    <% } %>
+                </div>
+                
                 <div class="row">
                 
                     <div class="col-lg-10 m-auto">
@@ -152,7 +164,7 @@
                                                                         </td>
 
 
-                                                                        <td><a href="/orderDetails?id=<%= order[i]._id %>"
+                                                                        <td><a href="/user/orderDetails?id=<%= order[i]._id %>"
                                                                                 class="btn-small d-block">View</a></td>
                                                                     </tr>
                                                                     <% } %>
@@ -386,18 +398,18 @@
                                             </div>
                                             <div class="card-body">
 
-                                                <form method="post" action="/editUserDetails?id=<%= user._id %>">
+                                                <form method="post" action="/user/editUserDetails?id=<%= user._id %>">
                                                     <div class="row">
                                                         <div class="form-group col-md-6">
                                                             <label> Name <span class="required">*</span></label>
-                                                            <input required="" value="<%= user.name %>"
-                                                                class="form-control square" name="name" type="text">
+                                                            <input required="" value="<%= user.username %>"
+                                                                class="form-control square" name="username" type="text">
                                                         </div>
 
                                                         <div class="form-group col-md-12">
                                                             <label>Mobile Number <span class="required">*</span></label>
-                                                            <input required="" value="<%= user.phone %>"
-                                                                class="form-control square" name="phone" type="text">
+                                                            <input required="" value="<%= user.contact %>"
+                                                                class="form-control square" name="contact" type="text">
                                                         </div>
                                                         <div class="col-md-12 mt-15">
                                                             <button type="submit" class="btn btn-fill-out submit"
@@ -416,7 +428,7 @@
             </div>
         </section>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
         <script>
             async function addMoney() {
@@ -428,7 +440,7 @@
                     inputPlaceholder: '₹'
                 })
                 $.ajax({
-                    url: "/addMoney",
+                    url: "/user/addMoney",
                     method: "post",
                     data: {
                         total: amount
@@ -469,7 +481,7 @@
             function verifyPayment(response, order) {
 
                 $.ajax({
-                    url: '/verify-payment',
+                    url: '/user/verify-payment',
                     method: 'post',
                     data: {
                         order,

@@ -2,6 +2,12 @@ const express = require("express")
 const authRouterAdmin = express.Router()
 
 const {
+    getOrderListPageAdmin,
+    getOrderDetailsPageAdmin,
+    changeOrderStatus
+} = require("../controller/orderController")
+
+const {
 adminlogin,
 adminSignUp,
 adminSignupPost,
@@ -12,7 +18,9 @@ adminRestrict,
 forgetPassword,
 forgetPasswordPost,
 resetPasswordPost,
-adminLogout
+adminLogout,
+getCouponPageAdmin,
+createCoupon
 } = require("../controller/adminAuthController")
 
 authRouterAdmin.get("/login",adminlogin)
@@ -24,5 +32,13 @@ authRouterAdmin.get("/forgetPassword",forgetPassword)
 authRouterAdmin.post("/forgetPassword",forgetPasswordPost)
 authRouterAdmin.post("/resetPassword",resetPasswordPost)
 authRouterAdmin.get("/logout",adminLogout)
+authRouterAdmin.get("/coupon",adminProtectRules,adminRestrict("admin"),getCouponPageAdmin)
+authRouterAdmin.post("/createCoupon",adminProtectRules,adminRestrict("admin"),createCoupon)
+
+authRouterAdmin.get("/orderlist",adminProtectRules,adminRestrict("admin"),getOrderListPageAdmin)
+authRouterAdmin.get("/orderDetailsAdmin",adminProtectRules,adminRestrict("admin"),getOrderDetailsPageAdmin)
+authRouterAdmin.get("/changeStatus",adminProtectRules,adminRestrict("admin"),changeOrderStatus)
+
+
 
 module.exports = authRouterAdmin

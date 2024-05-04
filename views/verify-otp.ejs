@@ -102,7 +102,7 @@
     </div>
 
 <div class="container col-4 login_wrap widget-taber-content p-30 background-white border-radius-5 mt-30">
-    <div class="padding_eight_all bg-white">
+    <div class="padding_eight_all ">
         <div class="heading_s1">
             <h3 class="mb-30">Email Verification</h3>
         </div>
@@ -211,37 +211,32 @@
     function handleOtp() {
 
         const otp = document.getElementById('otp').value
-
-
-
         $.ajax({
-            method: "POST",
-            url: "/user/verify-otp",
-            data: {
-                otp
-            },
-            success: (response) => {
-                if (response.status == false) {
+    method: "POST",
+    url: "/user/verify-otp",
+    data: {
+        otp
+    },
+    success: (response) => {
+        if (response.status === false) {
+            errorMessageElement.innerHTML = 'Entered OTP is incorrect';
+            errorMessageElement.style.display = 'block';
 
-                    errorMessageElement.innerHTML = 'Entered OTP is incorrect';
-                    errorMessageElement.style.display = 'block';
+            setTimeout(() => {
+                errorMessageElement.style.display = 'none';
+            }, 3000);
+        } else {
+            location.href = "/";
+        }
+    },
+    error: (xhr, status, error) => {
+        // Handle AJAX errors
+        console.error("AJAX error:", error);
+        // Optionally, display an error message to the user
+    },
+    dataType: 'json'
+});
 
-                    setTimeout(() => {
-                        errorMessageElement.style.display = 'none';
-                    }, 3000);
-
-
-                    setTimeout(() => {
-                        document.getElementById('errorMessage').innerHTML = '';
-                    }, 3000);
-
-                } else {
-                    location.href = "/"
-                    errorMessageElement.style.display = 'none';
-                }
-            }
-
-        })
     }
 </script>
 

@@ -53,7 +53,8 @@ const userSignupPost = [
                       req.session.userOtp = otp;
                       req.session.userData = req.body;
                       console.log( req.session.userData);
-                      res.render("verify-otp", { email });
+                      
+                      res.status(200).render("verify-otp", { email });
                       console.log("Email sented", info.messageId);
                   } else {
                     console.error("Error sending email:", info); 
@@ -72,12 +73,12 @@ const userSignupPost = [
 const resendOtp = async (req, res) => {
   try {
       const email = req.session.userData.email;
-      var newOtp = otpGenerator();
+      var newOtp = otpGenerator(); 
       console.log(email, newOtp);
 
 
                   // Prepare and send email with the OTP
-                  const message = `We have received a password reset request. Your OTP is: ${otp}`;
+                  const message = `We have received a password reset request. Your OTP is: ${newOtp}`;
                   const info = await sendEmail({
                       email: email,
                       subject: "Password Reset OTP",
@@ -90,11 +91,13 @@ const resendOtp = async (req, res) => {
           res.render("verify-otp", { email });
           console.log("Email resent", info.messageId);
       } else {
-          res.json({ success: false, message: 'Failed to resend OTP' });
+          
+          return res.status(401).render('signup', { error: ['Failed to resend OTP'], successMsg: '' });
       }
   } catch (error) {
       console.log(error.message);
-      res.json({ success: false, message: 'Error in resending OTP' });
+
+      return res.status(401).render('signup', { error: ['Error in resending OTP'], successMsg: '' });
 
   }
 }
@@ -129,9 +132,14 @@ const verifyOtp = async (req, res) => {
           return res.status(200).render('login', { error: ['Signup success'], successMsg: '' });
        
       } else {
-
+        const email = req.session.userData.email;
+        if(!email){
+          return res.status(401).render('signup', { error: ['Otp sending error!! Try again'], successMsg: '' });
+        }else{
           console.log("otp not matching");
-          res.json({ status: false })
+          return res.status(401).render('signup', { error: ['Otp mismatching'], successMsg: '' });
+        }
+         
       }
 
   } catch (error) {
@@ -273,6 +281,7 @@ const protectRules = asyncHandler(async (req, res, next) => {
 };
 
   const userLogout = (req,res)=>{
+    req.session = null
     res.cookie("token","", {maxAge:1})
     return res.status(200).redirect("/")
   }

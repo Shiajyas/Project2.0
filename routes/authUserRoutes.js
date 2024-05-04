@@ -28,6 +28,13 @@ authRouterUser.get("/auth/google/callback", passport.authenticate("google", {
   failureRedirect: "/user/login"
 }));
 
+// user Whishlist routeController
+
+const{ getWishlistPage,
+  addToWishlist,
+  deleteItemWishlist 
+} = require("../controller/wishlistController")
+
 // user Profile Routes
 
 const {
@@ -36,16 +43,28 @@ getAddUserProfile,
 postAddress,
 getEditUserProfile,
 editUserProfile,
-getDeleteAddress
+getDeleteAddress,
+editUserDetails
 } = require("../controller/userProfileController")
 
 // user cart routes
 
 const {
 getCartPage,
-addToCart
+addToCart,
+changeQuantity,
+deleteProduct
 } = require("../controller/cartController")
 
+//order rotes
+const{
+  getCheckoutPage,
+  orderPlaced,
+  verify,
+  getOrderDetailsPage,
+  cancelOrder,
+  returnOrder
+} = require("../controller/orderController")
 
 // user auth routes
 const {
@@ -79,7 +98,7 @@ authRouterUser.post("/forgetPassword",forgetPasswordPost)
 authRouterUser.post("/forget_verify-otp", fVerifyOtp)
 authRouterUser.post("/forget_resendOtp", resendOtp)
 authRouterUser.post("/verify-otp", verifyOtp)
-authRouterUser.post("/resendOtp", resendOtp)
+authRouterUser.get("/resendOtp", resendOtp)
 authRouterUser.post("/resetPassword",resetPasswordPost)
 // authRouterUser.get("/home",protectRules,restrict("user","admin"),getUserHome)
 authRouterUser.get("/product/detail",protectRules,restrict("user","admin"),getUserProductDetails)
@@ -99,7 +118,7 @@ failureRedirect: "/user/login"
 
 
 //User profile Routes 
-getDeleteAddress
+
 authRouterUser.get("/profile",protectRules,restrict("user","admin"), getUserProfile)
 authRouterUser.get("/addAddress",protectRules,restrict("user","admin"), getAddUserProfile)
 authRouterUser.post("/addAddress",protectRules,restrict("user","admin"), upload.array("images",1),postAddress)
@@ -107,10 +126,26 @@ authRouterUser.get("/addAddress",protectRules,restrict("user","admin"), getAddUs
 authRouterUser.get("/editAddress",protectRules,restrict("user","admin"), getEditUserProfile)
 authRouterUser.post("/editAddress",protectRules,restrict("user","admin"), editUserProfile)
 authRouterUser.get("/deleteAddress",protectRules,restrict("user","admin"), getDeleteAddress)
+authRouterUser.post("/editUserDetails",protectRules,restrict("user","admin"), editUserDetails)
 
-// cart routes
+// cart routes  
 authRouterUser.get("/cart",protectRules,restrict("user","admin"), getCartPage)
-authRouterUser.post("/addcart",protectRules,restrict("user","admin"),addToCart)
+authRouterUser.post("/addcart",protectRules,restrict("user","admin"),addToCart) 
+authRouterUser.post("/changeQuantity",protectRules,restrict("user","admin"),changeQuantity)
+authRouterUser.get("/deleteItem",protectRules,restrict("user","admin"),deleteProduct)
+
+// WishList routes 
+authRouterUser.get("/wishlist",protectRules,restrict("user","admin"),getWishlistPage)
+authRouterUser.post("/addWishlist",protectRules,restrict("user","admin"),addToWishlist)
+authRouterUser.get("/deleteWishlist",protectRules,restrict("user","admin"),deleteItemWishlist )
+
+//order routes 
+authRouterUser.get("/checkout",protectRules,restrict("user","admin"), getCheckoutPage) 
+authRouterUser.post("/orderPlaced",protectRules,restrict("user","admin"), orderPlaced) 
+authRouterUser.post("/verifyPayment",protectRules,restrict("user","admin"), verify) 
+authRouterUser.get("/orderDetails",protectRules,restrict("user","admin"), getOrderDetailsPage)
+authRouterUser.get("/cancelOrder",protectRules,restrict("user","admin"), cancelOrder)
+authRouterUser.get("/return",protectRules,restrict("user","admin"), returnOrder)
 
 module.exports = authRouterUser;
 

@@ -4,7 +4,8 @@ const asyncHandler = require("express-async-handler")
 const { validationResult } = require("express-validator")
 const jwt = require("jsonwebtoken")
 const util = require("util");
-const { error, log } = require('console');
+const Coupon = require("../models/cuponData")
+
 
 const adminlogin = (req,res)=>{
   const error = req.flash('error'); // Retrieve flash messages
@@ -103,7 +104,9 @@ const adminSignupPost = [
 
 
   const adminDashBord = (req,res)=>{
+   if(req.token){
     return res.status(200).render("adminConsole")
+   }
   }
 
   // Protect middleware
@@ -256,12 +259,52 @@ const resetPasswordPost = asyncHandler(async (req, res) => {
 });
 
 const adminLogout = (req,res)=>{
-  console.log("in");
+
+  req.session = null
   res.cookie("token", "", {maxAge:1})
-  req.flash("error","Logout success")
+
   return res.status(200).redirect("/")
 }
 
+const getCouponPageAdmin = async (req, res) => {
+  try {
+      const findCoupons = await Coupon.find({})
+      res.render("coupon", { coupons: findCoupons })
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
+const createCoupon = async (req, res) => {
+  try {
+
+      const data = {
+          couponName: req.body.couponName,
+          startDate: new Date(req.body.startDate + 'T00:00:00'),
+          endDate: new Date(req.body.endDate + 'T00:00:00'),
+          offerPrice: parseInt(req.body.offerPrice),
+          minimumPrice: parseInt(req.body.minimumPrice)
+      };
+
+      const newCoupon = new Coupon({
+          name: data.couponName,
+          createdOn: data.startDate,
+          expireOn: data.endDate,
+          offerPrice: data.offerPrice,
+          minimumPrice: data.minimumPrice
+      })
+
+      await newCoupon.save()
+          .then(data => console.log(data))
+
+      res.redirect("/admin/coupon")
+
+      console.log(data);
+
+  } catch (error) {
+      console.log(error.message);
+  }
+}
 
 module.exports = {
     adminlogin,
@@ -274,5 +317,7 @@ module.exports = {
     forgetPassword,
     forgetPasswordPost,
     resetPasswordPost,
-    adminLogout
+    adminLogout,
+    getCouponPageAdmin,
+    createCoupon
 }

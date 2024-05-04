@@ -8,6 +8,7 @@ const connectDB = require("./server/config/db")
 const flash = require("connect-flash")
 const path = require("path")
 const nocache = require("nocache")
+const CORS = require("cors")
 const User = require("./models/UserDb")
 const Product = require("./models/productData")
 const Category = require("./models/categoryData")
@@ -21,17 +22,17 @@ const port = process.env.PORT || 3000
 app.use(cookie()) 
 app.use(bodyParser.urlencoded({extended: true}))
 // app.use(methodOverride("_method")) 
+app.use(CORS())
 app.use(nocache())
 
 app.use(session({
     secret: process.env.SESSION_SECRET, 
     resave: false, 
     saveUninitialized: true,
-    cookie:{  
-
-        maxAge: 1000*60*60*24*7 // 1 week
+    cookie: {  
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     }
-}))
+}));
   
 app.use(flash())
 

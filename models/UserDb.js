@@ -70,6 +70,20 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false
 },
+history: {
+    type: Array
+},
+redeemed: {
+  type: Boolean,
+  default: false,
+},
+redeemedUsers: [
+  {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+  }
+],
   passwordChangedAt: Date,
   encryptedOTP: String,
   otpExpires: Date,
