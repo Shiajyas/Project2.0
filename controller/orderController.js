@@ -94,7 +94,7 @@ const orderPlaced = async (req, res) => {
     try {
         console.log("req.body================>", req.body);
         if (req.body.isSingle === "true") {
-            let { totalPrice, addressId, payment, productId } = req.body
+            let { totalPrice, addressId, payment, productId} = req.body
             const userId = req.user._id
             console.log(req.session.grandTotal,"from session");
             const grandTotal = req.session.grandTotal
@@ -104,13 +104,13 @@ const orderPlaced = async (req, res) => {
             // console.log("Find user ===>", findUser);
             const address = await Address.findOne({ userId: userId })
             // console.log(address);
-            // const findAddress = address.find(item => item._id.toString() === addressId);
+          
             const findAddress = address.address.find(item => item._id.toString() === addressId);
             console.log(findAddress);
             // console.log("Before product search")
             const findProduct = await Product.findOne({ _id: productId })
             // console.log(findProduct);
-
+            
             const productDetails = {
                 _id: findProduct._id,
                 price: findProduct.salePrice,
@@ -125,6 +125,7 @@ const orderPlaced = async (req, res) => {
                 address: findAddress,
                 payment: payment,
                 userId: userId,
+              
                 createdOn: Date.now(),
                 status: "Confirmed",
             }))
@@ -134,8 +135,6 @@ const orderPlaced = async (req, res) => {
             findProduct.quantity = findProduct.quantity - 1
 
             
-
-
             let orderDone; 
 
             if (newOrder.payment == 'cod') {
@@ -158,6 +157,7 @@ const orderPlaced = async (req, res) => {
 
             const { totalPrice, addressId, payment } = req.body
             // console.log(totalPrice, addressId, payment);
+            console.log("offer is", offer)
             const userId = req.user._id.toString();
             console.log(userId,0)
             const findUser = await User.findOne({ _id: userId })
@@ -198,12 +198,15 @@ const orderPlaced = async (req, res) => {
 
                 console.log(grandTotal)
 
+                
+
                 const newOrder = new Order({
                     product: orderedProducts,
                     totalPrice: grandTotal,
                     address: desiredAddress,
                     payment: payment,
                     userId: userId,
+                    
                     status: "Confirmed",
                     createdOn: Date.now()
 
@@ -405,6 +408,7 @@ const cancelOrder = async (req, res) => {
 
         if ( findOrder.payment === "wallet" ||findOrder.payment === "online") {
             
+            findUser.wallet += findOrder.totalPrice
 
             const newHistory = {
                 amount: findOrder.totalPrice,
@@ -432,6 +436,101 @@ const cancelOrder = async (req, res) => {
         }
 
         res.redirect('/user/profile');
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+const cancelProduct = async (req, res) => {
+    try {
+        console.log("im here");
+        const userId = req.user._id
+        const findUser = await User.findOne({ _id: userId })
+
+        // console.log(findUser)
+
+        if (!findUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const orderId = req.query.orderId;
+        const productId = req.query.productId;
+        
+        // console.log("Product ID:", productId);
+        // console.log("Order ID:", orderId);
+        
+        // Fetch the order by its ID
+        const order = await Order.findById(orderId);
+        
+        if (!order) {
+            console.log("Order not found");
+            return; // Exit early if the order is not found
+        }
+        
+       
+
+const productIdObj = new mongodb.ObjectId(productId);
+
+const product = order.product.find(product => product._id.equals(productIdObj));
+console.log(product)
+
+// Find the index of the product with the given ID in the order's products array
+const productIndex = order.product.findIndex(product => product._id.equals(productIdObj));
+if (productIndex === -1) {
+    console.log("Product not found in the order");
+    return; // Exit early if the product is not found in the order
+}
+
+// Remove the product from the products array using splice
+order.product.splice(productIndex, 1);
+
+// console.log("Order:", order);
+
+        const findOrder = await Order.findOne({ _id: orderId })
+
+        if ( findOrder.payment === "wallet" ||findOrder.payment === "online") {
+            
+          
+            const newTotal = findOrder.totalPrice - (product.price * product.quantity);
+            findOrder.totalPrice = newTotal;
+            
+            findUser.wallet += product.price * product.quantity
+            
+            const newHistory = {
+                amount: findOrder.totalPrice,
+
+                status: "credit",
+                date: Date.now()
+            }
+            findUser.history.push(newHistory)
+            await findUser.save();
+            await findOrder.save()
+        }
+
+        // console.log(findOrder);
+
+        for (const productData of findOrder.product) {
+            const productId = productData.ProductId;
+            const quantity = productData.quantity;
+
+            const product = await Product.findById(productId);
+
+            // console.log(product, "=>>>>>>>>>");
+
+            if (product) {
+                product.stock += quantity;
+                await product.save();
+            }
+        }
+      
+await order.save();   
+console.log("Product removed successfully");
+
+
+        // Redirect to '/user/orderDetails' with the order ID as a query parameter
+        res.redirect(`/user/orderDetails?id=${orderId}`);
+        
 
     } catch (error) {
         console.log(error.message);
@@ -490,6 +589,16 @@ const returnOrder = async (req, res) => {
     }
 }
 
+const getInvoice = async (req, res) => {
+    try {
+        console.log("helloooo");
+        await invoice.invoice(req, res);
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
 
 module.exports = {
     getCheckoutPage,
@@ -500,5 +609,7 @@ module.exports = {
     getOrderDetailsPageAdmin,
     changeOrderStatus,
     cancelOrder,
-    returnOrder
+    returnOrder,
+    cancelProduct,
+    getInvoice
 }

@@ -205,22 +205,6 @@
                     <div class="container col-6 mt-3">
 
 
-
-
-
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                      
                             <% if (isSingle===true) { %>
                                 <% totalAmount +=product[0].price; %>
                                     <% }else{ %>
@@ -267,9 +251,12 @@
 
                                                             <div class="ml-65">
                                                                 <%if(isSingle===true){%>
-                                                                    <button type="button" class="btn"
-                                                                        onclick="placeOrder('<%= user._id %>' , '<%=product[0]._id%>',  true)">Place
+                                                                    <% for( let i = 0; i < coupons.length; i++ ) { %>
+                                                                        <button type="button" class="btn"
+                                                                        onclick="placeOrder('<%= user._id %>' , ' <%= locals.offerPrice %>', '<%=product[0]._id%>',  true)">Place
                                                                         order</button>
+                                                                    <% } %>
+                                                                 
                                                                     <%}else{%>
                                                                         
                                                                         
@@ -358,7 +345,7 @@
                                             </div>
                                             <% } %>
                                                 <div class="col-lg-6 mb-3">
-                                                    <a href="/addAddress">
+                                                    <a href="/user/addAddress">
                                                         <button class="btn btn-primary w-100">Add address</button>
                                                     </a>
                                                 </div>
@@ -380,7 +367,7 @@
             // alert(prodId)
             let address = $("input[name='selectedAddress']:checked").val();
             let payment = $("input[name='payment_option']:checked").val();
-
+            
             const sum = document.getElementById("totalValue").textContent;
             const numericValue = parseInt(sum.replace(/[^\d.]/g, ''));
 
@@ -407,6 +394,7 @@
                         addressId: address,
                         payment: payment,
                         productId: prodId,
+                      
                         isSingle
                     },
                     success: function (response) {

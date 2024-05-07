@@ -12,7 +12,7 @@ const {filedCheker} = require("../utils/authHandler")
 
 const getUserProfile = async (req, res) => {
     try {
-        console.log(req.user);
+        // console.log(req.user);
         
         const userId = req.user._id;
 
@@ -267,6 +267,109 @@ const editUserDetails = async(req,res)=>{
  }
 }
 
+const verifyReferalCode = async (req, res) => {
+    try {
+        const referalCode = req.body.referalCode
+
+        console.log(referalCode)
+        const currentUser = await User.findOne({ _id: req.user._id })
+        // console.log("currentUser=>>>", currentUser);
+        const codeOwner = await User.findOne({ referalCode: referalCode })
+        // console.log("codeOwner=>>>", codeOwner);
+
+        if (currentUser.redeemed === true) {
+            console.log("You have already redeemed a referral code before!");
+            res.json({ message: "You have already redeemed a referral code before!" })
+            return
+        }
+
+        if (!codeOwner || codeOwner._id.equals(currentUser._id)) {
+            console.log("Invalid referral code!");
+            res.json({ message: "Invalid referral code!" })
+            return
+        }
+
+        const alreadyRedeemed = codeOwner.redeemedUsers.includes(currentUser._id)
+
+        if (alreadyRedeemed) {
+            console.log("You have already used this referral code!");
+            res.json({ message: "You have already used this referral code!" })
+            return
+        } else {
+
+            await User.updateOne(
+                { _id: req.user._id  },
+                {
+                    $inc: { wallet: 100 },
+                    $push: {
+                        history: {
+                            amount: 100,
+                            status: "credit",
+                            date: Date.now()
+                        }
+                    }
+                }
+            )
+                .then(data => console.log("currentUser Wallet = > ", data))
+
+                const newHistory = {
+                    amount: 100,
+    
+                    status: "credit",
+                    date: Date.now()
+                }
+                currentUser.history.push(newHistory)
+               await currentUser.save()
+            await User.updateOne(
+                { _id: codeOwner._id },
+                {
+                    $inc: { wallet: 200 },
+                    $push: {
+                        history: {
+                            amount: 200,
+                            status: "credit",
+                            date: Date.now()
+                        }
+                    }
+                }
+            )
+                .then(data => console.log("codeOwner Wallet = > ", data))
+           
+                const newHistory2 = {
+                    amount: 200,
+    
+                    status: "credit",
+                    date: Date.now()
+                }
+                codeOwner.history.push(newHistory2)
+                await codeOwner.save();
+            await User.updateOne(
+                { _id: codeOwner._id },
+                { $set: { referalCode: "" } }
+            )
+
+            await User.updateOne(
+                { _id: req.user._id  },
+                { $set: { redeemed: true } }
+            )
+
+            await User.updateOne(
+                { _id: codeOwner._id },
+                { $push: { redeemedUsers: currentUser._id } }
+            )
+
+            console.log("Referral code redeemed successfully!");
+
+            res.json({ message: "Referral code verified successfully!" })
+            return
+
+        }
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 
 
 module.exports = {
@@ -276,5 +379,6 @@ module.exports = {
     getEditUserProfile,
     editUserProfile,
     getDeleteAddress,
-    editUserDetails
+    editUserDetails,
+    verifyReferalCode 
 }

@@ -17,7 +17,9 @@ const {
     deleteProduct,
     searchProduct,
     getEditProduct,
-    editProduct
+    editProduct ,
+    addProductOffer,
+    removeProductOffer
 } = require("../controller/adminProductController")
 
 
@@ -30,5 +32,7 @@ adminProductRoutes.get("/delete",adminProtectRules,adminRestrict("admin"),delete
 adminProductRoutes.post("/search",adminProtectRules,adminRestrict("admin"),searchProduct)
 adminProductRoutes.get("/edit",adminProtectRules,adminRestrict("admin"),getEditProduct)
 adminProductRoutes.post("/edit",adminProtectRules,adminRestrict("admin"), upload.array("images", 4),editProduct) 
+adminProductRoutes.post("/addProductOffer",adminProtectRules,adminRestrict("admin"),addProductOffer)
+adminProductRoutes.post("/removeProductOffer",adminProtectRules,adminRestrict("admin"),removeProductOffer)
 
 module.exports = adminProductRoutes

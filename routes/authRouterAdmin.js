@@ -20,7 +20,15 @@ forgetPasswordPost,
 resetPasswordPost,
 adminLogout,
 getCouponPageAdmin,
-createCoupon
+createCoupon,
+getSalesReportPage,
+salesToday,
+salesWeekly,
+salesMonthly,
+salesYearly,
+dateWiseFilter,
+generatePdf,
+downloadExcel
 } = require("../controller/adminAuthController")
 
 authRouterAdmin.get("/login",adminlogin)
@@ -38,6 +46,15 @@ authRouterAdmin.post("/createCoupon",adminProtectRules,adminRestrict("admin"),cr
 authRouterAdmin.get("/orderlist",adminProtectRules,adminRestrict("admin"),getOrderListPageAdmin)
 authRouterAdmin.get("/orderDetailsAdmin",adminProtectRules,adminRestrict("admin"),getOrderDetailsPageAdmin)
 authRouterAdmin.get("/changeStatus",adminProtectRules,adminRestrict("admin"),changeOrderStatus)
+
+authRouterAdmin.get("/salesReport",adminProtectRules,adminRestrict("admin"),getSalesReportPage)
+authRouterAdmin.get("/salesToday",adminProtectRules,adminRestrict("admin"),salesToday)
+authRouterAdmin.get("/salesWeekly",adminProtectRules,adminRestrict("admin"),salesWeekly)
+authRouterAdmin.get("/salesMonthly",adminProtectRules,adminRestrict("admin"),salesMonthly)
+authRouterAdmin.get("/salesYearly",adminProtectRules,adminRestrict("admin"),salesYearly)
+authRouterAdmin.get("/dateWiseFilter",adminProtectRules,adminRestrict("admin"),dateWiseFilter)
+authRouterAdmin.post("/generatePdf",adminProtectRules,adminRestrict("admin"),generatePdf)
+authRouterAdmin.post("/downloadExcel",adminProtectRules,adminRestrict("admin"),downloadExcel)
 
 
 

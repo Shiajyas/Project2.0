@@ -135,18 +135,7 @@
                                         </ul>
                                     </div>
                                     <!-- Color and Size Options -->
-                                    <div class="attr-detail attr-color mb-15">
-                                        <strong class="mr-10">Color</strong>
-                                        <ul class="list-filter color-filter">
-                                            <!-- Color options here -->
-                                        </ul>
-                                    </div>
-                                    <div class="attr-detail attr-size">
-                                        <strong class="mr-10">Size</strong>
-                                        <ul class="list-filter size-filter font-small">
-                                            <!-- Size options here -->
-                                        </ul>
-                                    </div>
+                               
                                     <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                                     <!-- Quantity and Action Buttons -->
                                     <div class="detail-extralink">
@@ -156,7 +145,7 @@
                                             <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
                                         </div>
                                         <div class="product-extra-link2">
-                                            <button type="submit" class="button button-add-to-cart"><a href="/user/addcart?id=<%= product._id %>">Add to cart</a> </button>
+                                            <button type="submit" class="button button-add-to-cart"onclick="addToCart('<%= products._id%>')">Add to cart</a> </button>
                                             <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
                                             <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                         </div>
@@ -299,6 +288,172 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function addToCart(prodId) {
+        
+        var stock = 1;
+        $.ajax({
+            url: `/user/addcart?id=${prodId}`,
+            method: "post",
+            data: {
+                stock: stock
+            },
+            success: (res) => {
+                if (res.status === true) {
+
+                    Swal.fire({
+                        title: 'Added to Cart!',
+                        text: 'Continue Shopping',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    })
+                } else if (res.status === "Out of stock") {
+                    Swal.fire({
+                        title: 'Stock!!',
+                        text: "The product is out of stock",
+                        icon: 'error', // Corrected from 'fail' to 'error'
+                        timer: 2000,
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'You need to Login first',
+                        text: 'Continue Shopping',
+                        icon: 'warning',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => { window.location.href = '/user/login' });
+                }
+            },
+            error: (err) => {
+                console.error(err, "hello");
+                alert("error occured")
+            }
+        });
+    }
+</script>
+
+<script>
+
+function addToWishlist(productId){
+    $.ajax({
+        url : "/user/addwishlist",
+        method : "post",
+        data : {
+            productId : productId
+        },
+        success : (response)=>{
+            if(response.status == true){
+                Swal.fire({
+                                title: 'Added to Wishlist!',
+                                text: 'Continue Shopping',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            })
+            }else if(response.status == false){
+                Swal.fire({
+                                title: 'You need to Login first',
+                                text: 'Continue Shopping',
+                                icon: 'warning',
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => { window.location.href = '/user/login' });
+            }
+        }
+    })
+    return false;
+}
+
+
+function getCurrentPageFromURL(element) {
+    
+    const url = window.location.href;
+    const match = url.match(/page=(\d+)/);
+
+    if (match && match[1]) {
+        return parseInt(match[1], 10);
+    }
+
+    return 1;
+}
+
+
+function handleSortChange(selectedOption){
+    // console.log(selectedOption);
+    let option = selectedOption;
+    $.ajax({
+        url: "/sortProducts",
+        method: "POST",
+        data: {
+            option: option,
+            // page: page
+        },
+        success: (response) => {
+            if (response.status === true) {
+                // Assuming the server returns an array of products in response.data
+                const sortedProducts = response.data;
+                console.log(sortedProducts);
+                // Clear existing product grid content
+                $(".product-grid-3").empty();
+                // $(".pagination").empty();
+
+                // Render each product in the container
+                sortedProducts.currentProduct.forEach((product) => {
+                    const productDiv = $("<div class='col-lg-4 col-md-4 col-12 col-sm-6'>" +
+                        "<div class='product-cart-wrap mb-30'>" +
+                        "<div class='product-img-action-wrap'>" +
+                        "<div class='product-img product-img-zoom'>" +
+                        "<a href='/productDetails?id=" + product.id + "'>" +
+                        "<img class='default-img' src='/uploads/product-images/" + product.productImage[0] + "' alt=''>" +
+                        "</a>" +
+                        "</div>" +
+                        "<div class='product-action-1'>" +
+                        "<a aria-label='Add To Wishlist' class='action-btn hover-up' href='javascript:void(0);' onclick='addToWishlist(\"" + product._id + "\")'>" +
+                        "<i class='fi-rs-heart'></i>" +
+                        "</a>" +
+                        "</div>" +
+                        "<div class='product-badges product-badges-position product-badges-mrg'>" +
+                        "<span class='hot'>Hot</span>" +
+                        "</div>" +
+                        "</div>" +
+                        "<div class='product-content-wrap'>" +
+                        "<div class='product-category'>" +
+                        "<a href='shop-grid-right.html'>" + product.brand + "</a>" +
+                        "</div>" +
+                        "<h2><a href='shop-product-right.html'>" + product.productName + "</a></h2>" +
+                        "<div class='product-price'>" +
+                        "<span>₹" + product.salePrice.toLocaleString('en-IN') + "</span>" +
+                        "<span class='old-price'>₹" + product.regularPrice.toLocaleString('en-IN') + "</span>" +
+                        "</div>" +
+                        "<div class='product-action-1 show'>" +
+                        "<a aria-label='Add To Cart' class='action-btn hover-up' href='shop-cart.html'>" +
+                        "<i class='fi-rs-shopping-bag-add'></i>" +
+                        "</a>" +
+                        "</div>" +
+                        "</div>" +
+                        "</div>" +
+                        "</div>");
+
+                    // Append the productDiv to the product grid
+                    $(".product-grid-3").append(productDiv);
+                    // $("#pagination").html(response.data.totalPages);
+                });
+            } else {
+                console.error("Error in sorting products:", response);
+            }
+        }
+    });
+}
+
+
+
+
+
+
+    
+</script>
 <!-- Vendor JS-->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

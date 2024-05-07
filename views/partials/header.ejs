@@ -199,7 +199,7 @@
                                     <li><i class="fi-rs-user"></i><a href="/user/profile">.<%= user.username %></a></li>
                                     <li><a href="/user/logout">Logout</a></li>
                                 <% } else { %>
-                                    <li><i class="fi-rs-user"></i><a href="/user/signup">Log In / Sign Up</a></li>
+                                    <li><i class="fi-rs-user"></i><a href="/user/login">Log In / Sign Up</a></li>
                                 <% } %>
                                 
                             </ul>
@@ -216,21 +216,8 @@
                     </div>
                     <div class="header-right">
                         <div class="search-style-2">
-                            <form action="#">
-                                <select class="select-active">
-                                    <option>All Categories</option>
-                                    <option>Women's</option>
-                                    <option>Men's</option>
-                                    <option>Cellphones</option>
-                                    <option>Computer</option>
-                                    <option>Electronics</option>
-                                    <option> Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option>
-                                </select>
-                                <input type="text" placeholder="Search for items...">
+                            <form action="/user/product/search">
+                                <input type="text" id="filterItem" name="search" class="form-control" placeholder="Search for items...">
                             </form>
                         </div>
                         <div class="header-action-right">

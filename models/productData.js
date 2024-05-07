@@ -45,24 +45,28 @@ const productSchema = mongoose.Schema({
     stock: { 
         type: Number,
      },
+     productOffer : {
+         type : Number,
+         default : 0
+     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required:true
     },
-    images: { 
-        type: Array
-    }, // Assuming you store image paths
-    isListed:{
-    type: Boolean,
-    default: true
-    },
-    dateCreated: {
-        type: Date,
-        default: Date.now,
-    },
-    
-})
+        images: { 
+            type: Array
+        }, // Assuming you store image paths
+        isListed:{
+        type: Boolean,
+        default: true
+        },
+        dateCreated: {
+            type: Date,
+            default: Date.now,
+        },
+        
+    })
 
 productSchema.pre('save', async function(next) {
     if (!this.id) {

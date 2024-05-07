@@ -47,6 +47,10 @@ const userSchema = mongoose.Schema({
     minlength: 8,
     select: false,
   },
+  wallet: {
+      type: Number,
+      default: 0
+  },
   cart: {
       type: Array
   },

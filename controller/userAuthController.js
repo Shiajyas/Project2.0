@@ -8,6 +8,9 @@ const {  validationResult } = require('express-validator');
 const jwt = require("jsonwebtoken")
 const util = require("util");
 const sendEmail = require("../Utils/email")
+const Coupon = require("../models/cuponData")
+const mongoose = require('mongoose');
+const mongodb = require("mongodb")
 const bcrypt = require("bcryptjs");
 // Handle user signup POST request
 
@@ -463,17 +466,18 @@ const productSortL_H = async (req, res) => {
     const products = await Product.find().sort({ price: 1 });
     for (const product of products) {
       const categoryId = product.category; 
+      categorys = await Category.find({}) 
       const category = await Category.findById(categoryId);
       product.categoryD = category;
     }
 
     if (products.length > 0) { 
       console.log(products);
-      return res.status(200).render("home2", { products: products, user: user });
+      return res.status(200).render("home2", { products: products, user: user, category: categorys });
     } else {
     
       console.log("No products found.");
-      return res.status(200).render("home2", { products: [], user: user });
+      return res.status(200).render("home2", { products: [], user: user, category: categorys });
     }
   } catch (error) {
     console.error(error.stack); 
@@ -490,17 +494,18 @@ const productSortH_L = async (req, res) => {
     const products = await Product.find().sort({ price: -1 }); 
     for (const product of products) {
       const categoryId = product.category; 
+      categorys = await Category.find({}) 
       const category = await Category.findById(categoryId);
       product.categoryD = category;
     }
 
     if (products.length > 0) { 
       console.log(products);
-      return res.status(200).render("home2", { products: products, user: user });
+      return res.status(200).render("home2", { products: products, user: user, category: categorys });
     } else {
      
       console.log("No products found.");
-      return res.status(200).render("home2", { products: [], user: user });
+      return res.status(200).render("home2", { products: [], user: user, category: categorys })
     }
   } catch (error) {
     console.error(error.stack);
@@ -515,6 +520,141 @@ const productSortAVG = async (req, res) => {
     console.log("1");
     
     const products = await Product.find({ rate: { $gt: 2 } }).sort({ price: 1 });
+    for (const product of products) {
+      const categoryId = product.category; 
+      categorys = await Category.find({}) 
+      const category = await Category.findById(categoryId);
+      product.categoryD = category;
+    }
+
+    if (products.length > 0) {
+      console.log(products);
+      return res.status(200).render("home2", { products: products, user: user, category: categorys });
+    } else {
+    
+      console.log("No products found.");
+      return res.status(200).render("home2", { products: [], user: user, category: categorys });
+    }
+  } catch (error) {
+    console.error(error.stack); 
+    res.status(500).render("404");
+  }
+};
+
+const  category_H_L  = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    let catId = req.query.catId;
+
+    // Trim the catId value to remove leading and trailing spaces
+    catId = catId.trim();
+
+    // Check if catId is provided and valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(catId)) {
+      console.log("Invalid category ID provided.");
+      return res.status(400).render("404"); // Bad request status
+    }
+
+    const cattIdObj = new mongoose.Types.ObjectId(catId);
+    console.log(cattIdObj);
+
+    const categorys = await Category.find({}); // Define categorys array here
+
+    const products = await Product.find({ category: cattIdObj }).populate('category').sort({ price: -1 }); // Sort by price in ascending order
+    console.log(products);
+
+    for (const product of products) {
+      const categoryId = product.category;
+   
+      
+
+      const category = await Category.findById(categoryId);
+      if (category) {
+          product.categoryD = category.isListed; 
+      } else {
+          console.error(`Category not found for product`);
+      }
+    }
+
+    if (products.length > 0) {
+      console.log(products);
+      return res.status(200).render("home2", { products: products, user: user, category: categorys });
+    } else {
+      console.log("No products found for the provided category ID.");
+      return res.status(200).render("home2", { products: [], user: user, category: categorys });
+    }
+  } catch (error) {
+    console.error(error.stack);
+    res.status(500).render("404");
+  }
+};
+
+
+
+const category_L_H = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    let catId = req.query.catId;
+
+    // Trim the catId value to remove leading and trailing spaces
+    catId = catId.trim();
+
+    // Check if catId is provided and valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(catId)) {
+      console.log("Invalid category ID provided.");
+      return res.status(400).render("404"); // Bad request status
+    }
+
+    const cattIdObj = new mongoose.Types.ObjectId(catId);
+    console.log(cattIdObj);
+
+    const categorys = await Category.find({}); // Define categorys array here
+
+    const products = await Product.find({ category: cattIdObj }).populate('category').sort({ price: 1 }); // Sort by price in ascending order
+    console.log(products);
+
+    for (const product of products) {
+      const categoryId = product.category;
+   
+      
+      const category = await Category.findById(categoryId);
+      if (category) {
+          product.categoryD = category.isListed; 
+      } else {
+          console.error(`Category not found for product`);
+      }
+    }
+
+    if (products.length > 0) {
+      console.log(products);
+      return res.status(200).render("home2", { products: products, user: user, category: categorys });
+    } else {
+      console.log("No products found for the provided category ID.");
+      return res.status(200).render("home2", { products: [], user: user, category: categorys });
+    }
+  } catch (error) {
+    console.error(error.stack);
+    res.status(500).render("404");
+  }
+};
+
+
+const newProducts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    console.log("1");
+    
+    const tenDaysAgo = new Date();
+tenDaysAgo.setDate(tenDaysAgo.getDate() - 10); // Subtract 10 days from the current date
+
+const products = await Product.find({
+    dateCreated: { $gte: tenDaysAgo },
+    isListed: true
+});
+
     for (const product of products) {
       const categoryId = product.category; 
       const category = await Category.findById(categoryId);
@@ -532,6 +672,174 @@ const productSortAVG = async (req, res) => {
   } catch (error) {
     console.error(error.stack); 
     res.status(500).render("404");
+  }
+};
+
+
+
+const applyCoupon = async (req, res) => {
+  try {
+      const userId = req.user._id
+      console.log(req.body);
+      const selectedCoupon = await Coupon.findOne({ name: req.body.coupon })
+      // console.log(selectedCoupon);
+      if (!selectedCoupon) {
+          console.log("no coupon");
+          res.json({ noCoupon: true })
+      } else if (selectedCoupon.userId.includes(userId)) {
+          console.log("already used");
+          res.json({ used: true })
+      } else {
+          console.log("coupon exists");
+          await Coupon.updateOne(
+              { name: req.body.coupon },
+              {
+                  $addToSet: {
+                      userId: userId
+                  }
+              }
+          );
+          const gt = parseInt(req.body.total) - parseInt(selectedCoupon.offerPrice);
+          console.log(gt, "----");
+          res.json({ gt: gt, offerPrice: parseInt(selectedCoupon.offerPrice) })
+      }
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
+const  categoryAvg = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    let catId = req.query.catId;
+
+    // Trim the catId value to remove leading and trailing spaces
+    catId = catId.trim();
+
+    // Check if catId is provided and valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(catId)) {
+      console.log("Invalid category ID provided.");
+      return res.status(400).render("404"); // Bad request status
+    }
+
+    const cattIdObj = new mongoose.Types.ObjectId(catId);
+    console.log(cattIdObj);
+
+    const categorys = await Category.find({}); // Define categorys array here
+
+
+   const products = await Product.find({
+    
+      rate: { $gt: 2 }, // Products with rating greater than 2
+      category: cattIdObj // Products associated with the provided category ID
+    }).populate('category').sort({ price: 1 });
+
+    console.log(products);
+
+    for (const product of products) {
+      const categoryId = product.category;
+   
+      
+      const category = await Category.findById(categoryId);
+      if (category) {
+          product.categoryD = category.isListed; 
+      } else {
+          console.error(`Category not found for product`);
+      }
+    }
+
+    if (products.length > 0) {
+      console.log(products);
+      return res.status(200).render("home2", { products: products, user: user, category: categorys });
+    } else {
+      console.log("No products found for the provided category ID.");
+      return res.status(200).render("home2", { products: [], user: user, category: categorys });
+    }
+  } catch (error) {
+    console.error(error.stack);
+    res.status(500).render("404");
+  }
+};
+
+
+
+const getShopPage = async (req, res) => {
+  try {
+      const user = req.user._id
+      const products = await Product.find({ isBlocked: false })
+      const count = await Product.find({ isBlocked: false }).count()
+      const categories = await Category.find({ isListed: true })
+
+      let itemsPerPage = 6
+      let currentPage = parseInt(req.query.page) || 1
+      let startIndex = (currentPage - 1) * itemsPerPage
+      let endIndex = startIndex + itemsPerPage
+      let totalPages = Math.ceil(products.length / 6)
+      const currentProduct = products.slice(startIndex, endIndex)
+
+      res.render("shop",
+          {
+              user: user,
+              products: currentProduct,
+              category: categories,
+              count: count,
+              totalPages,
+              currentPage,
+          })
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
+const productSearch = async (req, res) => {
+  try {
+    let categorys; // Define categorys variable here
+    
+    let search = req.query.search;
+    const searchNoSpecialChar = search.replace(/[^a-zA-Z0-9 ]/g, "");
+    const products = await Product.find({
+      $or: [{ name: { $regex: new RegExp(searchNoSpecialChar, "i") } }],
+    });
+
+    console.log(products);
+
+    if (products.length === 0) {
+      categorys = await Category.find({}); // Assign to categorys here
+      return res.render("home2", { products: [], user: null, category: categorys });
+    }
+
+    for (const product of products) {
+      const categoryId = product.category;
+      categorys = await Category.find({}); // Assign to categorys here
+      
+      const category = await Category.findById(categoryId);
+      if (category) {
+        product.categoryD = category.isListed; 
+      } else {
+        console.error(`Category not found for product ${product._id}`);
+      }
+    }
+
+    if (!req.user || !req.user._id) {
+      console.log("User not logged in or user ID not provided");
+      return res.render("home2", { products: products, user: null, category: categorys });
+    } else {
+      // If user is logged in
+      const userId = req.user._id;
+      const user = await User.findById(userId);
+      console.log(user);
+      if (!user || user.blocked) {
+        console.log("User does not exist or is blocked");
+        return res.render("home2", { products: products, user: null, category: categorys });
+      } else {
+        console.log("User exists and is not blocked");
+        return res.render("home2", { products: products, user: null, category: categorys });
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).render('404');
   }
 };
 
@@ -558,6 +866,13 @@ module.exports = {
     productSortAVG,
     verifyOtp,
     resendOtp,
-    fVerifyOtp
+    fVerifyOtp,
+    applyCoupon,
+    newProducts,
+    category_L_H,
+    category_H_L,
+    categoryAvg,
+    getShopPage,
+    productSearch
   };
   

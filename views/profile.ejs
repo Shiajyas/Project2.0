@@ -448,10 +448,10 @@
                     success: (data) => {
                         if (data.razorpay) {
                             var options = {
-                                "key": "rzp_test_kkytoEMYHJ1dn3",
+                                "key": "rzp_test_297s5pqDLLHUia",
                                 "amount": data.order.amount,
                                 "currency": "INR",
-                                "name": "LapLux",
+                                "name": "evera",
                                 "description": "Test Transaction",
                                 "image": "https://example.com/your_logo",
                                 "order_id": data.order.id,
@@ -512,7 +512,7 @@
                 let referalCode = document.getElementById("referalCode").value
           
                 $.ajax({
-                    url: "/verifyReferalCode",
+                    url: "/user/verifyReferalCode",
                     method: "post",
                     data: {
                         referalCode

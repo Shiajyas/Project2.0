@@ -21,6 +21,7 @@ const port = process.env.PORT || 3000
 
 app.use(cookie()) 
 app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.json());
 // app.use(methodOverride("_method")) 
 app.use(CORS())
 app.use(nocache())
@@ -77,17 +78,21 @@ app.set("views", path.join(__dirname, "views"));
  
 
  
-app.get("/", protectRules, restrict("user", "admin"), async (req, res) => {
+app.get("/", protectRules, restrict("user","admin"), async (req, res) => {
     try {
-        const products = await Product.find({ isListed: true }).limit(9);
+        let categorys; // Define categorys variable here
+        
+        const products = await Product.find({ isListed: true })
 
+        console.log(products)
         for (const product of products) {
             const categoryId = product.category;
+            categorys = await Category.find({}) // Assign to categorys here
+            
             const category = await Category.findById(categoryId);
             if (category) {
                 product.categoryD = category.isListed; 
             } else {
-               
                 console.error(`Category not found for product ${product._id}`);
             }
         }
@@ -95,20 +100,20 @@ app.get("/", protectRules, restrict("user", "admin"), async (req, res) => {
         if (!req.user || !req.user._id) {
           
             console.log("User not logged in or user ID not provided");
-            res.render("home2", { products: products, user: null });
+            res.render("home2", { products: products, user: null, category: categorys});
         } else {
             // If user is logged in
             const userId = req.user._id;
             const user = await User.findById(userId);
-console.log(user)
+            console.log(user)
             if (!user || user.blocked) {
                
                 console.log("User does not exist or is blocked");
-                res.render("home2", { products: products, user: null });
+                res.render("home2", { products: products, user: null, category: categorys});
             } else {
                
                 console.log("User exists and is not blocked");
-                res.render("home2", { user: user, products: products });
+                res.render("home2", { products: products, user: user, category: categorys});
             }
         }
     } catch (err) {
@@ -117,7 +122,6 @@ console.log(user)
         return res.status(500).render('404');
     }
 });
-
 
  
 app.use("/user", require("./routes/authUserRoutes"))    

@@ -31,6 +31,9 @@ const orderSchema = Mongoose.Schema({
     },
     date : {
         type : String,
+    },
+    offer:{
+        type: Number
     }
 })
 
